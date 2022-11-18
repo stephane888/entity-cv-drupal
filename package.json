@@ -13,9 +13,12 @@
     "bootstrap-vue": "^2.23.1",
     "components_h_vuejs": "file:../components_bootstrapvuejs",
     "core-js": "^3.8.3",
+    "mini-css-extract-plugin": "^2.7.0",
+    "vee-validate": "^3.4.14",
     "vue": "^2.6.14",
     "vue-router": "^3.5.1",
-    "vuex": "^3.6.2"
+    "vuex": "^3.6.2",
+    "wbuutilities": "file:../wbuutilities"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
@@ -31,7 +34,8 @@
     "eslint-plugin-vue": "^8.0.3",
     "sass": "^1.56.1",
     "sass-loader": "^13.2.0",
-    "vue-template-compiler": "^2.6.14"
+    "vue-loader": "^17.0.1",
+    "vue-template-compiler": "^2.7.14"
   },
   "eslintConfig": {
     "root": true,
