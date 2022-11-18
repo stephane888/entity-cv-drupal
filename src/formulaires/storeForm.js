@@ -40,12 +40,34 @@ export default {
       commit("ACTIVE_RUNNING");
       const param = {
         // homepage: window.location.pathname.split("/").pop(),
-        homepage: 1,
+        id: 1,
+        entity_type_id: "model_cv",
       };
       return request
-        .bPost("/vuejs-entity/form/model_cv/default/model_cv", param)
+        .bPost("/vuejs-entity/form/get-form/from/entity-id", param, {}, false)
         .then((resp) => {
-          commit("SET_PRESENTATION", resp.data);
+          // Recuperation du paragraph presentation.
+          if (
+            resp.data.model &&
+            resp.data.model.presentation &&
+            resp.data.model.presentation.length
+          ) {
+            const param2 = {
+              // homepage: window.location.pathname.split("/").pop(),
+              id: resp.data.model.presentation[0].target_id,
+              entity_type_id: "paragraph",
+            };
+            request
+              .bPost(
+                "/vuejs-entity/form/get-form/from/entity-id",
+                param2,
+                {},
+                false
+              )
+              .then((pres) => {
+                commit("SET_PRESENTATION", pres.data);
+              });
+          }
         });
     },
     saveEntity({ commit, state }) {

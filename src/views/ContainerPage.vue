@@ -8,11 +8,25 @@
           <hbk-button @click="openModal"> Conseils </hbk-button>
         </slot>
       </header>
-      <main class="row">
+      <main class="row justify-content-center">
         <div class="col-md-6">
-          <slot></slot>
+          <div class="app-builder-cv__content"><slot></slot></div>
+          <div class="form-footer-app d-flex">
+            <div class="container">
+              <b-row class="justify-content-center">
+                <b-col md="6">
+                  <div
+                    class="form-footer-app__content d-flex justify-content-end"
+                  >
+                    <slot name="app-footer"></slot>
+                  </div>
+                </b-col>
+                <b-col v-if="showRight" md="6"></b-col>
+              </b-row>
+            </div>
+          </div>
         </div>
-        <div class="col-md-6"><slot name="right"></slot></div>
+        <div v-if="showRight" class="col-md-6"><slot name="right"></slot></div>
       </main>
     </b-container>
   </div>
@@ -21,6 +35,12 @@
 <script>
 export default {
   name: "ContainerPage",
+  props: {
+    showRight: {
+      type: Boolean,
+      default: false,
+    },
+  },
   methods: {
     /**
      * --//

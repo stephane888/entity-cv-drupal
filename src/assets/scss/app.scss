@@ -1,0 +1,21 @@
+@use "@stephane888/wbu-atomique/scss/wbu-ressources-clean.scss" as *;
+@use "./variables";
+.app-builder-cv {
+  &__content {
+    margin-bottom: $wbu-margin * 8;
+  }
+  .form-footer-app {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    left: 0;
+    right: 0;
+
+    &__content {
+      padding: $wbu-margin * 1.5 $wbu-margin;
+      background: rgba(white, 0.7);
+      border-top: 1px solid rgb(231, 235, 238);
+      box-shadow: rgb(0 0 0 / 50%) 0px -10px 25px -26px;
+    }
+  }
+}

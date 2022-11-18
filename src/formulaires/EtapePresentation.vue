@@ -21,6 +21,13 @@
         :class_css="['mb-5']"
         namespace_store="storeForm/setValue"
       ></component>
+      <template #app-footer>
+        <div>
+          <hbk-button icon="save" variant="outline-info" icon-variant="">
+            Etape suivante
+          </hbk-button>
+        </div>
+      </template>
     </ContainerPage>
     <modalForm
       :title-modal="titleModal"

@@ -1,15 +1,31 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-
-import EtapePresentation from "../formulaires/EtapePresentation.vue";
+//import App from "../App.vue";
+import LayoutView from "../views/LayoutView.vue";
+//import EtapePresentation from "../formulaires/EtapePresentation.vue";
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
-    name: "Presentation",
-    component: EtapePresentation,
+    redirect: "presentation",
+    component: LayoutView,
+    meta: {
+      requiresAuth: false,
+      hideFooter: true,
+    },
+    children: [
+      {
+        path: "/presentation",
+        name: "presentation",
+        meta: {
+          requiresAuth: false,
+          hideFooter: true,
+        },
+        component: () => import("../formulaires/EtapePresentation.vue"),
+      },
+    ],
   },
   {
     path: "/about",
