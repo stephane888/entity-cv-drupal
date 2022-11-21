@@ -21,6 +21,12 @@ export default {
     SET_PRESENTATION(state, payload) {
       state.presentaton = payload;
     },
+    SET_EXPERIENCE(state, payload) {
+      state.experience = payload;
+    },
+    SET_FORMATION(state, payload) {
+      state.formation = payload;
+    },
     ACTIVE_RUNNING(state) {
       state.running = true;
     },
@@ -52,8 +58,8 @@ export default {
             resp.data.model.presentation &&
             resp.data.model.presentation.length
           ) {
+            //
             const param2 = {
-              // homepage: window.location.pathname.split("/").pop(),
               id: resp.data.model.presentation[0].target_id,
               entity_type_id: "paragraph",
             };
@@ -66,6 +72,36 @@ export default {
               )
               .then((pres) => {
                 commit("SET_PRESENTATION", pres.data);
+              });
+            //
+            const param3 = {
+              id: resp.data.model.experience[0].target_id,
+              entity_type_id: "paragraph",
+            };
+            request
+              .bPost(
+                "/vuejs-entity/form/get-form/from/entity-id",
+                param3,
+                {},
+                false
+              )
+              .then((pres) => {
+                commit("SET_EXPERIENCE", pres.data);
+              });
+            //
+            const param4 = {
+              id: resp.data.model.formation[0].target_id,
+              entity_type_id: "paragraph",
+            };
+            request
+              .bPost(
+                "/vuejs-entity/form/get-form/from/entity-id",
+                param4,
+                {},
+                false
+              )
+              .then((pres) => {
+                commit("SET_FORMATION", pres.data);
               });
           }
         });

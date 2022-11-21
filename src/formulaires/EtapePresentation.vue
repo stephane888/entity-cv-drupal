@@ -11,7 +11,7 @@
           contacter et quelle est votre profession
         </div>
       </HCardIcon>
-      <h4>Coordonnées</h4>
+      <h4 class="font-weight-bold">Coordonnées</h4>
       <component
         :is="render.template"
         v-for="(render, k) in buildFields()"
@@ -23,9 +23,11 @@
       ></component>
       <template #app-footer>
         <div>
-          <hbk-button icon="save" variant="outline-info" icon-variant="">
-            Etape suivante
-          </hbk-button>
+          <router-link to="/experience">
+            <hbk-button icon="save" variant="outline-info" icon-variant="">
+              Etape suivante
+            </hbk-button>
+          </router-link>
         </div>
       </template>
     </ContainerPage>

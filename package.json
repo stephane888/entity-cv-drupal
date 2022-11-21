@@ -5,7 +5,9 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "Dev": "vue-cli-service build --mode development  --dest files --target lib --name BuilderCv 'src/AppCmpts.js'",
+    "Prod": "vue-cli-service build --mode production  --dest files --target lib --name BuilderCv 'src/AppCmpts.js'"
   },
   "dependencies": {
     "@stephane888/wbu-atomique": "file:../wbu-atomique",
@@ -13,10 +15,13 @@
     "bootstrap-vue": "^2.23.1",
     "components_h_vuejs": "file:../components_bootstrapvuejs",
     "core-js": "^3.8.3",
+    "drupal-vuejs": "file:../drupal-vuejs",
     "mini-css-extract-plugin": "^2.7.0",
     "vee-validate": "^3.4.14",
     "vue": "^2.6.14",
+    "vue-custom-scrollbar": "^1.4.4",
     "vue-router": "^3.5.1",
+    "vue2-transitions": "^0.3.0",
     "vuex": "^3.6.2",
     "wbuutilities": "file:../wbuutilities"
   },

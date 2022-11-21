@@ -25,6 +25,33 @@ const routes = [
         },
         component: () => import("../formulaires/EtapePresentation.vue"),
       },
+      {
+        path: "/experience",
+        name: "Experience",
+        meta: {
+          requiresAuth: false,
+          hideFooter: true,
+        },
+        component: () => import("../formulaires/EtapeExperience.vue"),
+      },
+      {
+        path: "/formation",
+        name: "Formation",
+        meta: {
+          requiresAuth: false,
+          hideFooter: true,
+        },
+        component: () => import("../formulaires/EtapeFormation.vue"),
+      },
+      {
+        path: "/login",
+        name: "Connection / inscription",
+        meta: {
+          requiresAuth: false,
+          hideFooter: true,
+        },
+        component: () => import("../formulaires/EtapeLogin.vue"),
+      },
     ],
   },
   {
@@ -39,7 +66,8 @@ const routes = [
 ];
 
 const router = new VueRouter({
-  mode: "history",
+  //mode: "history",
+  mode: "hash",
   base: process.env.BASE_URL,
   routes,
 });
