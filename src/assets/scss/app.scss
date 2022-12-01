@@ -15,7 +15,7 @@
   }
   &__content {
     padding-bottom: $wbu-margin * 6;
-    height: calc(100vh - 100px);
+    min-height: 500px;
   }
   .form-footer-app {
     position: absolute;

@@ -12,7 +12,6 @@
           récentes et pertinentes.
         </div>
       </HCardIcon>
-      <h4 class="font-weight-bold">Expériences</h4>
       <component
         :is="render.template"
         v-for="(render, k) in buildFields()"
@@ -36,8 +35,13 @@
               Etape precedente
             </hbk-button>
           </router-link>
-          <router-link to="/login">
-            <hbk-button icon="save" variant="outline-info" icon-variant="">
+          <router-link :to="nextStep">
+            <hbk-button
+              icon="save"
+              variant="outline-info"
+              icon-variant=""
+              @click="$store.dispatch('storeForm/updateLocalStorage')"
+            >
               Etape suivante
             </hbk-button>
           </router-link>
@@ -75,7 +79,12 @@ export default {
     ...mapState("storeForm", {
       form: (state) => state.formation.form,
       model: (state) => state.formation.model,
+      user: (state) => state.user,
     }),
+    nextStep() {
+      if (this.user && this.user.uid) return "/save-cv";
+      else return "/login";
+    },
   },
   methods: {
     buildFields() {

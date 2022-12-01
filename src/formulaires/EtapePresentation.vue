@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :SubDomain="SubDomain">
     <ContainerPage>
       <template #entete>
         <hbk-button @click="openModal"> Conseils </hbk-button>
@@ -11,6 +11,7 @@
           contacter et quelle est votre profession
         </div>
       </HCardIcon>
+
       <h4 class="font-weight-bold">Coordonnées</h4>
       <component
         :is="render.template"
@@ -24,7 +25,12 @@
       <template #app-footer>
         <div>
           <router-link to="/experience">
-            <hbk-button icon="save" variant="outline-info" icon-variant="">
+            <hbk-button
+              icon="save"
+              variant="outline-info"
+              icon-variant=""
+              @click="$store.dispatch('storeForm/updateLocalStorage')"
+            >
               Etape suivante
             </hbk-button>
           </router-link>
@@ -45,7 +51,7 @@
 
 <script>
 import modalForm from "./modalForm.vue";
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 import loadField from "components_h_vuejs/src/components/fieldsDrupal/loadField";
 export default {
   name: "EtapePresentation",
@@ -63,6 +69,16 @@ export default {
       form: (state) => state.presentaton.form,
       model: (state) => state.presentaton.model,
     }),
+    // ...mapGetters({
+    //   testGet: "storeForm/testGet",
+    //   SubDomain: "storeForm/SubDomain",
+    // }),
+    // ...mapGetters("storeForm", ["testGet", "SubDomain"]),
+    // ...mapGetters("storeForm", {
+    //   testGet: "testGet",
+    //   SubDomain: "SubDomain",
+    // }),
+    ...mapGetters(["SubDomain"]),
   },
   methods: {
     buildFields() {

@@ -12,7 +12,7 @@
           et pertinents.
         </div>
       </HCardIcon>
-      <h4 class="font-weight-bold">Expériences</h4>
+
       <component
         :is="render.template"
         v-for="(render, k) in buildFields()"
@@ -37,7 +37,12 @@
             </hbk-button>
           </router-link>
           <router-link to="/formation">
-            <hbk-button icon="save" variant="outline-info" icon-variant="">
+            <hbk-button
+              icon="save"
+              variant="outline-info"
+              icon-variant=""
+              @click="$store.dispatch('storeForm/updateLocalStorage')"
+            >
               Etape suivante
             </hbk-button>
           </router-link>

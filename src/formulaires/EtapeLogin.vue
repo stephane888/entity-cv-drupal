@@ -34,12 +34,18 @@ export default {
     loginRegister,
   },
   computed: {
-    ...mapState({
-      strings: (state) => state.strings,
+    ...mapState("storeForm", {
+      user: (state) => state.user,
     }),
   },
   mounted() {
     this.check_if_user_connected();
+    if (!this.user.uid) {
+      console.log("user login : ", this.user);
+      this.$store.dispatch("storeForm/checkStatusUser");
+    } else {
+      this.nextStep();
+    }
   },
 
   methods: {
@@ -58,6 +64,9 @@ export default {
         },
         false
       );
+    },
+    nextStep() {
+      this.$router.push({ path: `/save-cv` });
     },
   },
 };

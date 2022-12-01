@@ -52,6 +52,15 @@ const routes = [
         },
         component: () => import("../formulaires/EtapeLogin.vue"),
       },
+      {
+        path: "/save-cv",
+        name: "Save datas",
+        meta: {
+          requiresAuth: false,
+          hideFooter: true,
+        },
+        component: () => import("../formulaires/SaveForms.vue"),
+      },
     ],
   },
   {
