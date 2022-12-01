@@ -179,6 +179,29 @@ export default {
             this.runStep(steps, state);
           }
           break;
+        case "generate_style":
+          step.status = "run";
+          if (this.domainRegister.id) {
+            var passNext = () => {
+              setTimeout(() => {
+                step.status = "ok";
+                this.currentBuildStep++;
+                this.runStep(steps, state);
+              }, 500);
+            };
+            this.generateStyleTheme()
+              .then(() => {
+                passNext();
+              })
+              .catch(() => {
+                passNext();
+              });
+          } else {
+            step.status = "error";
+            this.currentBuildStep++;
+            this.runStep(steps, state);
+          }
+          break;
         default:
           // on ne devrait pas arrivé ici.
           this.messages.warnings.push(
@@ -378,6 +401,8 @@ export default {
       state.storeForm.entete_paragraph.model.field_domain_source = [
         { target_id: this.domainRegister.id },
       ];
+      // Requis car le contenu de la page d'accueil ne s'active pas toujours.
+      this.addDefaultBlockInRegion();
       this.CreateMenus(state)
         .then(() => {
           resolv(
@@ -399,6 +424,44 @@ export default {
           reject();
         });
     });
+  },
+
+  /**
+   * -
+   */
+  addDefaultBlockInRegion() {
+    // Add default content region
+    const id_system = limit("mainpagecontent" + this.domainRegister.id, 30, "");
+    const system_main_block = {
+      id: id_system,
+      theme: this.domainRegister.id,
+      region: "content",
+      plugin: "system_main_block",
+      status: true,
+      visibility: {
+        domain: {
+          id: "domain",
+          negate: false,
+          context_mapping: {
+            domain: "@domain.current_domain_context:domain",
+          },
+          domains: {
+            [this.domainRegister.id]: this.domainRegister.id,
+          },
+        },
+      },
+      settings: {
+        id: id_system,
+        label: this.domainRegister.id + " : contenu principal",
+        label_display: false,
+        provider: "system",
+      },
+      weight: 0,
+    };
+    return this.bPost(
+      "/vuejs-entity/entity/add-block-in-region",
+      system_main_block
+    );
   },
 
   /**
@@ -530,6 +593,42 @@ export default {
         },
       }
     );
+  },
+
+  generateStyleTheme() {
+    return new Promise((resolv, reject) => {
+      const idHome = window.location.pathname.split("/").pop();
+      // On recupere le style definit dans model_cv pour mettre au niveau du fichier custom(.js|.scss) du theme.
+      this.bGet(
+        "/generate_style_theme/set_default_style/" +
+          idHome +
+          "/" +
+          this.domainRegister.id +
+          "model_cv"
+      )
+        .then(() => {
+          // On charge les styles. ( mise à jour des imports scss. )
+          this.bGet(
+            "/layoutgenentitystyles/manuel/api-generate/" +
+              this.domainRegister.id
+          )
+            .then(() => {
+              resolv(
+                // On regenere le theme.
+                this.bGet(
+                  "/generate-style-theme/update-style-theme/" +
+                    this.domainRegister.id
+                )
+              );
+            })
+            .catch(() => {
+              reject();
+            });
+        })
+        .catch((e) => {
+          reject(e);
+        });
+    });
   },
   /**
    *
