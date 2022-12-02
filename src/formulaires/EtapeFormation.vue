@@ -18,8 +18,8 @@
         :key="k"
         :field="render.field"
         :model="render.model"
-        :class_css="['mb-5']"
-        namespace_store="storeForm/setValue"
+        :class-css="['mb-5']"
+        namespace-store="storeForm"
         @addNewValue="addNewValue($event, render)"
         @removeField="removeField($event, render)"
       ></component>

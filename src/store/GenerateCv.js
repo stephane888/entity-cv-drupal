@@ -604,7 +604,7 @@ export default {
           idHome +
           "/" +
           this.domainRegister.id +
-          "model_cv"
+          "/model_cv"
       )
         .then(() => {
           // On charge les styles. ( mise à jour des imports scss. )

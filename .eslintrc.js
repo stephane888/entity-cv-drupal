@@ -28,5 +28,6 @@ module.exports = {
         ignorePattern: "^_",
       },
     ],
+    "vue/attribute-hyphenation": 0, //Ceci ne fonctionne pas au niveau du modules entity-cv et components ???
   },
 };

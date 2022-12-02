@@ -19,8 +19,8 @@
         :key="k"
         :field="render.field"
         :model="render.model"
-        :class_css="['mb-5']"
-        namespace_store="storeForm/setValue"
+        :class-css="['mb-5']"
+        namespace-store="storeForm"
         @addNewValue="addNewValue($event, render)"
         @removeField="removeField($event, render)"
       ></component>
@@ -65,6 +65,7 @@
 import modalForm from "./modalForm.vue";
 import { mapState } from "vuex";
 import loadField from "components_h_vuejs/src/components/fieldsDrupal/loadField";
+import request from "../request";
 export default {
   name: "EtapeExperience",
   components: {
@@ -86,6 +87,7 @@ export default {
     buildFields() {
       const fields = [];
       loadField.debug = true;
+      loadField.getConfig(request);
       for (const i in this.form) {
         fields.push({
           template: loadField.getField(this.form[i]),

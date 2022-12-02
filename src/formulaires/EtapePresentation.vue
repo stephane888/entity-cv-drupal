@@ -19,8 +19,8 @@
         :key="k"
         :field="render.field"
         :model="render.model"
-        :class_css="['mb-5']"
-        namespace_store="storeForm/setValue"
+        :class-css="['mb-5']"
+        namespace-store="storeForm"
       ></component>
       <template #app-footer>
         <div>
@@ -53,6 +53,7 @@
 import modalForm from "./modalForm.vue";
 import { mapState, mapGetters } from "vuex";
 import loadField from "components_h_vuejs/src/components/fieldsDrupal/loadField";
+import request from "../request";
 export default {
   name: "EtapePresentation",
   components: {
@@ -83,6 +84,7 @@ export default {
   methods: {
     buildFields() {
       const fields = [];
+      loadField.getConfig(request);
       for (const i in this.form) {
         fields.push({
           template: loadField.getField(this.form[i]),

@@ -190,7 +190,7 @@ export default {
           "SET_PAGE_SUPP",
           JSON.parse(localStorage.getItem("app_cv.page_supplementaires"))
         );
-        console.log("Load datas from CACHE");
+        commit("DISABLE_RUNNING");
       } else {
         //on se rassure que l'utilisateur est sur la page d'accuiel;
         request
@@ -200,6 +200,7 @@ export default {
               commit("CLEAN_LOCALSTORAGE");
               router.push({ path: `/presentation` });
             }
+            commit("DISABLE_RUNNING");
             // Recuperation des pages supplementaires :
             if (resp.data.model && resp.data.model.page_supplementaires) {
               commit("SET_PAGE_SUPP", resp.data.model.page_supplementaires);
@@ -293,6 +294,9 @@ export default {
               //
               localStorage.setItem("app_cv.hash", hash);
             }
+          })
+          .catch(() => {
+            commit("DISABLE_RUNNING");
           });
       }
     },
