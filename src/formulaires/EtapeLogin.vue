@@ -57,10 +57,7 @@ export default {
         "login_rx_vuejs__user_is_login",
         () => {
           console.log("user login");
-          // users.getCurrentUser().then((user) => {
-          //   this.$store.commit("SET_USER", user);
-          //   this.$store.commit("renderByStep/nextStep");
-          // });
+          this.nextStep();
         },
         false
       );
