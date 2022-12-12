@@ -27,7 +27,7 @@ const routes = [
       },
       {
         path: "/experience",
-        name: "Experience",
+        name: "experience",
         meta: {
           requiresAuth: false,
           hideFooter: true,
@@ -42,6 +42,16 @@ const routes = [
           hideFooter: true,
         },
         component: () => import("../formulaires/EtapeFormation.vue"),
+      },
+      {
+        path: "/layouts-sections/:keySections/:idEtape",
+        name: "dynamique-section",
+        meta: {
+          requiresAuth: false,
+          hideFooter: true,
+        },
+        props: true,
+        component: () => import("../formulaires/EtapeDynamiqueSection.vue"),
       },
       {
         path: "/login",

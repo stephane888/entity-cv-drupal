@@ -113,6 +113,12 @@ export default new Vuex.Store({
         return str;
       } else return null;
     },
+    /**
+     * Les identifiants de champs doivent provenir du model.
+     */
+    etapes: (state) => {
+      return Object.keys(state.storeForm.layout_paragraphs);
+    },
   },
   mutations: {
     ACTIVE_CREATION(state) {

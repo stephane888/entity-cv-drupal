@@ -300,6 +300,31 @@ export default {
           state.storeForm.formation.model
         );
       };
+      // for layout_paragraphs
+      const promises = [];
+      for (const i in state.storeForm.layout_paragraphs) {
+        promises.push(
+          new Promise((resolv, reject) => {
+            state.storeForm.layout_paragraphs[i].model.field_domain_access = [
+              { target_id: this.domainRegister.id },
+            ];
+            state.storeForm.layout_paragraphs[i].model.field_domain_source = [
+              { target_id: this.domainRegister.id },
+            ];
+            this.bPost(
+              "/vuejs-entity/entity/save-duplicate-ref/paragraph",
+              state.storeForm.layout_paragraphs[i].model
+            )
+              .then((resp) => {
+                resolv({ target_id: resp.data.id[0].value });
+              })
+              .catch((er) => {
+                reject(er);
+              });
+          })
+        );
+      }
+
       //
       const idHome = window.location.pathname.split("/").pop();
       let nom = store.getters.GetNom;
@@ -323,12 +348,15 @@ export default {
               formation()
                 .then((re) => {
                   values["formation"] = [{ target_id: re.data.id[0].value }];
-                  resolv(
-                    this.bPost(
-                      "/buildercv/entity/generate-cv/" + idHome,
-                      values
-                    )
-                  );
+                  Promise.all(promises).then((vals) => {
+                    values["layout_paragraphs"] = vals;
+                    resolv(
+                      this.bPost(
+                        "/buildercv/entity/generate-cv/" + idHome,
+                        values
+                      )
+                    );
+                  });
                 })
                 .catch((er) => {
                   reject(er);

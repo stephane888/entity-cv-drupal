@@ -82,11 +82,13 @@ export default {
       form: (state) => state.experience.form,
       model: (state) => state.experience.model,
     }),
+    currentRoute() {
+      return this.$router.history.current.path;
+    },
   },
   methods: {
     buildFields() {
       const fields = [];
-      loadField.debug = true;
       loadField.getConfig(request);
       for (const i in this.form) {
         fields.push({
@@ -111,7 +113,7 @@ export default {
       this.model[render.field.name].push(value);
     },
     removeField(index, render) {
-      this.model[render.field.name].splice(0, index);
+      this.model[render.field.name].splice(index, 1);
     },
   },
 };

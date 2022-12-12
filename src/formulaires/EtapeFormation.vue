@@ -48,6 +48,7 @@
         </div>
       </template>
     </ContainerPage>
+
     <modalForm
       :title-modal="titleModal"
       :manage-modal="manageModal"
@@ -62,7 +63,7 @@
 
 <script>
 import modalForm from "./modalForm.vue";
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 import loadField from "components_h_vuejs/src/components/fieldsDrupal/loadField";
 export default {
   name: "EtapeFormation",
@@ -80,16 +81,21 @@ export default {
       form: (state) => state.formation.form,
       model: (state) => state.formation.model,
       user: (state) => state.user,
+      layout_paragraphs: (state) => state.layout_paragraphs,
     }),
+    ...mapGetters(["etapes"]),
     nextStep() {
-      if (this.user && this.user.uid) return "/save-cv";
-      else return "/login";
+      // if (this.user && this.user.uid) return "/save-cv";
+      // else return "/login";
+      if (this.etapes.length) {
+        return "/layouts-sections/" + this.etapes[0] + "/0";
+      } else return "/login";
     },
   },
   methods: {
     buildFields() {
+      console.log("getters : ", this.$store.getters);
       const fields = [];
-      loadField.debug = true;
       for (const i in this.form) {
         fields.push({
           template: loadField.getField(this.form[i]),

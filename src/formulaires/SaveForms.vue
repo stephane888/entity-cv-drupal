@@ -169,12 +169,6 @@ export default {
     closeModal() {
       this.manageModal = false;
     },
-    addNewValue(value, render) {
-      this.model[render.field.name].push(value);
-    },
-    removeField(index, render) {
-      this.model[render.field.name].splice(0, index);
-    },
     saveCv() {
       this.$store.dispatch("create_site_cv");
     },

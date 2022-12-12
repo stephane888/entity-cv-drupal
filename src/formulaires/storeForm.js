@@ -23,6 +23,11 @@ export default {
     entete_paragraph: {},
 
     /**
+     * Les layouts.
+     */
+    layout_paragraphs: {},
+
+    /**
      *
      */
     page_supplementaires: [],
@@ -37,7 +42,6 @@ export default {
     //
     user: {},
   }),
-
   // getters: {
   //   testGet: (state) => {
   //     return state.user;
@@ -118,6 +122,13 @@ export default {
       state.footer_paragraph = payload;
       localStorage.setItem("app_cv.footer_paragraph", JSON.stringify(payload));
     },
+    SET_layout_paragraphs(state, payload) {
+      state.layout_paragraphs[payload.k] = payload.val;
+      localStorage.setItem(
+        "app_cv.layout_paragraphs",
+        JSON.stringify(state.layout_paragraphs)
+      );
+    },
     SET_PAGE_SUPP(state, payload) {
       state.page_supplementaires = payload;
       localStorage.setItem(
@@ -132,9 +143,48 @@ export default {
       state.running = false;
     },
     SET_VALUE(state, payload) {
-      if (payload.fieldName && payload.value && state.presentaton.model) {
-        if (state.presentaton.model[payload.fieldName]) {
-          state.presentaton.model[payload.fieldName] = payload.value;
+      if (payload.fieldName && payload.value) {
+        switch (router.history.current.path) {
+          case "/presentation":
+            if (
+              state.presentaton.model &&
+              state.presentaton.model[payload.fieldName]
+            ) {
+              state.presentaton.model[payload.fieldName] = payload.value;
+            }
+            break;
+          case "/experience":
+            if (
+              state.experience.model &&
+              state.experience.model[payload.fieldName]
+            ) {
+              state.experience.model[payload.fieldName] = payload.value;
+            }
+            break;
+          case "/formation":
+            if (
+              state.formation.model &&
+              state.formation.model[payload.fieldName]
+            ) {
+              state.formation.model[payload.fieldName] = payload.value;
+            }
+            break;
+          default:
+            // Analyse des urls url dynamique:
+            if (
+              router.history.current.path.includes("layouts-sections") &&
+              router.history.current.params.keySections &&
+              state.layout_paragraphs[
+                router.history.current.params.keySections
+              ] &&
+              state.layout_paragraphs[router.history.current.params.keySections]
+                .model
+            ) {
+              state.layout_paragraphs[
+                router.history.current.params.keySections
+              ].model[payload.fieldName] = payload.value;
+            } else console.log(" Pas de correspondance disponible : ", payload);
+            break;
         }
       }
     },
@@ -190,6 +240,17 @@ export default {
           "SET_PAGE_SUPP",
           JSON.parse(localStorage.getItem("app_cv.page_supplementaires"))
         );
+        //
+        var datas = JSON.parse(
+          localStorage.getItem("app_cv.layout_paragraphs")
+        );
+        for (const i in datas) {
+          commit("SET_layout_paragraphs", {
+            k: i,
+            val: datas[i],
+          });
+        }
+
         commit("DISABLE_RUNNING");
       } else {
         //on se rassure que l'utilisateur est sur la page d'accuiel;
@@ -291,6 +352,33 @@ export default {
                   commit("SET_FOOTER", res.data);
                 });
 
+              // Recuperation des données dans la section.
+              resp.data.model.layout_paragraphs.forEach((target_id) => {
+                request
+                  .bPost(
+                    "/vuejs-entity/form/get-form/from/entity-id",
+                    {
+                      id: target_id.target_id,
+                      entity_type_id: "paragraph",
+                      duplicate: true,
+                    },
+                    {},
+                    false
+                  )
+                  .then((res) => {
+                    console.log("section : ", res.data);
+                    if (
+                      res.data &&
+                      res.data.model.type[0] &&
+                      res.data.model.type[0].target_id != "buttons_download_cv"
+                    ) {
+                      commit("SET_layout_paragraphs", {
+                        k: res.data.model.type[0].target_id,
+                        val: res.data,
+                      });
+                    }
+                  });
+              });
               //
               localStorage.setItem("app_cv.hash", hash);
             }
