@@ -5,12 +5,8 @@
         <hbk-button @click="openModal"> Conseils </hbk-button>
       </template>
       <HCardIcon icon="exclamation-lg">
-        <template #titre> Vos diplomes / formations </template>
-        <div>
-          Commencez par vos études les plus récentes et remontez dans le passé.
-          Si vous avez suivi de nombreuses études, n'ajoutez que les plus
-          récentes et pertinentes.
-        </div>
+        <template #titre> {{ headerBlock.title }} </template>
+        <div v-html="headerBlock.text"></div>
       </HCardIcon>
       <component
         :is="render.template"
@@ -91,7 +87,7 @@ export default {
       layout_paragraphs: (state) => state.layout_paragraphs,
       user: (state) => state.user,
     }),
-    ...mapGetters(["etapes"]),
+    ...mapGetters(["etapes", "modelDynamique"]),
     nextStep() {
       const idEtape = parseInt(this.idEtape) + 1;
       const length = this.etapes.length;
@@ -117,10 +113,32 @@ export default {
       } else return {};
     },
     model() {
-      if (this.keySections) {
+      if (
+        this.keySections &&
+        this.layout_paragraphs[this.keySections] &&
+        this.layout_paragraphs[this.keySections].model
+      ) {
         const md = this.layout_paragraphs[this.keySections].model;
         return md;
       } else return {};
+    },
+    headerBlock() {
+      const datas = { title: "", text: "" };
+      switch (this.keySections) {
+        case "competences_et_langues_cv_":
+          datas.title = "Compétences et langues";
+          datas.text =
+            "<p> Les compétences que vous ajoutez devraient correspondre aux prérequis du poste auquel vous postulez. </p> <p>Vous pouvez remplir la section langue si vous parlez plus d'une langue.</p> ";
+          break;
+        case "loisir_cv_":
+          datas.title = "Centres d'intérêt ou Loisirs";
+          datas.text =
+            "<p> Demandez-vous si l’activité que vous pratiquez vous donne une bonne image, si ce hobby peut vous distinguer des autres candidats et si c’est une passion dont vous pourrez parler avec enthousiasme lors de l’entretien. Evitez les platitudes, les clichés et les lieux communs. </p>";
+          break;
+        default:
+          break;
+      }
+      return datas;
     },
   },
   mounted() {
@@ -150,7 +168,16 @@ export default {
       this.manageModal = false;
     },
     addNewValue(value, render) {
-      this.model[render.field.name].push(value);
+      console.log("addNewValue : ", render, "\n", value);
+      const vals =
+        this.layout_paragraphs[this.keySections].model[render.field.name];
+      // Specifiquement à cette environnement, on ne peut pas mettre à jour le computed, this.model
+      // On met à jour directement, la donnée present dans le layout.
+      vals.push(value);
+      this.$store.dispatch("storeForm/setValue", {
+        value: vals,
+        fieldName: render.field.name,
+      });
     },
     removeField(index, render) {
       this.model[render.field.name].splice(index, 1);

@@ -65,6 +65,7 @@
 import modalForm from "./modalForm.vue";
 import { mapState, mapGetters } from "vuex";
 import loadField from "components_h_vuejs/src/components/fieldsDrupal/loadField";
+import request from "../request";
 export default {
   name: "EtapeFormation",
   components: {
@@ -94,7 +95,7 @@ export default {
   },
   methods: {
     buildFields() {
-      console.log("getters : ", this.$store.getters);
+      loadField.getConfig(request);
       const fields = [];
       for (const i in this.form) {
         fields.push({

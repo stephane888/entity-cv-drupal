@@ -123,7 +123,8 @@ export default {
       localStorage.setItem("app_cv.footer_paragraph", JSON.stringify(payload));
     },
     SET_layout_paragraphs(state, payload) {
-      state.layout_paragraphs[payload.k] = payload.val;
+      // state.layout_paragraphs[payload.k] = payload.val;
+      Vue.set(state.layout_paragraphs, payload.k, payload.val);
       localStorage.setItem(
         "app_cv.layout_paragraphs",
         JSON.stringify(state.layout_paragraphs)

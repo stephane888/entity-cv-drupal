@@ -26,12 +26,13 @@
 </template>
 
 <script>
-import { loginRegister } from "drupal-vuejs";
 import { mapState } from "vuex";
 export default {
   name: "EtapeLogin",
   components: {
-    loginRegister,
+    loginRegister: () => {
+      import("drupal-vuejs/src/App/components/loginRegister.vue");
+    },
   },
   computed: {
     ...mapState("storeForm", {

@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import storeForm from "../formulaires/storeForm";
 import saveEntity from "./GenerateCv";
+import router from "../router/index";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -118,6 +119,16 @@ export default new Vuex.Store({
      */
     etapes: (state) => {
       return Object.keys(state.storeForm.layout_paragraphs);
+    },
+    modelDynamique: (state) => {
+      if (
+        router.history.current.params &&
+        router.history.current.params.keySections &&
+        state.storeForm.layout_paragraphs
+      ) {
+        const keySections = router.history.current.params.keySections;
+        return state.storeForm.layout_paragraphs[keySections].model;
+      } else return {};
     },
   },
   mutations: {
