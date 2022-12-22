@@ -22,6 +22,7 @@
         namespace-store="storeForm"
         @addNewValue="addNewValue($event, render)"
         @removeField="removeField($event, render)"
+        @array_move="array_move($event, render)"
       ></component>
       <template #app-footer>
         <div class="w-100 d-flex justify-content-between">
@@ -81,6 +82,7 @@ export default {
     ...mapState("storeForm", {
       form: (state) => state.formation.form,
       model: (state) => state.formation.model,
+      form_sort: (state) => state.formation.form_sort,
       user: (state) => state.user,
       layout_paragraphs: (state) => state.layout_paragraphs,
     }),
@@ -95,6 +97,19 @@ export default {
   },
   methods: {
     buildFields() {
+      const fields = [];
+      loadField.getConfig(request);
+      if (this.form_sort)
+        this.form_sort.forEach((field) => {
+          fields.push({
+            template: loadField.getField(field),
+            field: field,
+            model: this.model,
+          });
+        });
+      return fields;
+    },
+    buildFieldsOld() {
       loadField.getConfig(request);
       const fields = [];
       for (const i in this.form) {
@@ -121,6 +136,22 @@ export default {
     },
     removeField(index, render) {
       this.model[render.field.name].splice(0, index);
+    },
+    array_move(evt, render) {
+      const moveItem = (arr, fromIndex, toIndex) => {
+        let itemRemoved = arr.splice(fromIndex, 1); // assign the removed item as an array
+        arr.splice(toIndex, 0, itemRemoved[0]); // insert itemRemoved into the target index
+        return arr;
+      };
+      const vals = moveItem(
+        this.model[render.field.name],
+        evt.oldIndex,
+        evt.newIndex
+      );
+      this.$store.dispatch("storeForm/setValue", {
+        value: vals,
+        fieldName: render.field.name,
+      });
     },
   },
 };

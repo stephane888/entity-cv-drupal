@@ -4,7 +4,10 @@
       <div class="d-flex justify-content-center mt-5">
         <HCardIcon icon="exclamation-lg">
           <template #titre> Connexion / inscription </template>
-          <div>veillez ...</div>
+          <div>
+            veillez entrer vos identifints pour creer un compte ou vous
+            connectez si vous en avez deja.
+          </div>
         </HCardIcon>
       </div>
 
@@ -16,8 +19,8 @@
           <p class="text-secondary">
             En vous inscrivant, vous acceptez nos
             <a href="#"> Conditions d'utilisation </a>, de recevoir des emails
-            et des MAJ de <strong>WB-HORISON</strong> et vous reconnaissez avoir
-            lu notre <a href="#"> Politique de confidentialité</a>
+            et des MAJ de <strong> WB-HORISON </strong> et vous reconnaissez
+            avoir lu notre <a href="#"> Politique de confidentialité </a>
           </p>
         </template>
       </loginRegister>
@@ -31,7 +34,7 @@ export default {
   name: "EtapeLogin",
   components: {
     loginRegister: () => {
-      import("drupal-vuejs/src/App/components/loginRegister.vue");
+      return import("drupal-vuejs/src/App/components/loginRegister.vue");
     },
   },
   computed: {
@@ -42,7 +45,7 @@ export default {
   mounted() {
     this.check_if_user_connected();
     if (!this.user.uid) {
-      console.log("user login : ", this.user);
+      // console.log(" user login : ", this.user);
       this.$store.dispatch("storeForm/checkStatusUser");
     } else {
       this.nextStep();

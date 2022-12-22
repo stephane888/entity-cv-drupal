@@ -69,6 +69,7 @@ export default {
     ...mapState("storeForm", {
       form: (state) => state.presentaton.form,
       model: (state) => state.presentaton.model,
+      form_sort: (state) => state.presentaton.form_sort,
     }),
     // ...mapGetters({
     //   testGet: "storeForm/testGet",
@@ -85,13 +86,14 @@ export default {
     buildFields() {
       const fields = [];
       loadField.getConfig(request);
-      for (const i in this.form) {
-        fields.push({
-          template: loadField.getField(this.form[i]),
-          field: this.form[i],
-          model: this.model,
+      if (this.form_sort)
+        this.form_sort.forEach((field) => {
+          fields.push({
+            template: loadField.getField(field),
+            field: field,
+            model: this.model,
+          });
         });
-      }
       return fields;
     },
     /**
