@@ -9,17 +9,23 @@
         <div v-html="headerBlock.text"></div>
       </HCardIcon>
       <component
-        :is="render.template"
-        v-for="(render, k) in buildFields()"
-        :key="k"
-        :field="render.field"
-        :model="render.model"
-        :class-css="['mb-5']"
-        namespace-store="storeForm"
-        @addNewValue="addNewValue($event, render)"
-        @removeField="removeField($event, render)"
-        @array_move="array_move($event, render)"
-      ></component>
+        :is="fields_layout_dynamique.template"
+        :entity="fields_layout_dynamique.entity"
+        :class-entity="['pt-1']"
+      >
+        <component
+          :is="render.template"
+          v-for="(render, k) in fields_layout_dynamique.fields"
+          :key="k"
+          :field="render.field"
+          :model="render.model"
+          :entities="render.entities"
+          :class-css="['mb-5']"
+          :parent-name="keySections + '.entity.'"
+          :parent-child-name="keySections + '.entities.'"
+          namespace-store="storeForm"
+        ></component>
+      </component>
       <template #app-footer>
         <div class="w-100 d-flex justify-content-between">
           <router-link :to="previewStep">
@@ -33,12 +39,7 @@
             </hbk-button>
           </router-link>
           <router-link :to="nextStep">
-            <hbk-button
-              icon="save"
-              variant="outline-info"
-              icon-variant=""
-              @click="$store.dispatch('storeForm/updateLocalStorage')"
-            >
+            <hbk-button icon="save" variant="outline-info" icon-variant="">
               Etape suivante
             </hbk-button>
           </router-link>
@@ -60,8 +61,9 @@
 <script>
 import modalForm from "./modalForm.vue";
 import { mapState, mapGetters } from "vuex";
-import loadField from "components_h_vuejs/src/components/fieldsDrupal/loadField";
-import request from "../request";
+// import loadField from "components_h_vuejs/src/components/fieldsDrupal/loadField";
+// import request from "../request";
+// import generateField from "components_h_vuejs/src/js/FormUttilities";
 export default {
   name: "EtapeDynamiqueSection",
   components: {
@@ -81,19 +83,22 @@ export default {
     return {
       titleModal: "",
       manageModal: false,
+      container: {},
     };
   },
+
   computed: {
     ...mapState("storeForm", {
-      layout_paragraphs: (state) => state.layout_paragraphs,
+      fields_layout_dynamique: (state) => state.fields_layout_dynamique,
       user: (state) => state.user,
     }),
-    ...mapGetters(["etapes", "modelDynamique"]),
+    ...mapGetters(["etapes"]),
     nextStep() {
       const idEtape = parseInt(this.idEtape) + 1;
       const length = this.etapes.length;
       if (idEtape < length) {
         if (length) {
+          console.log("NEXT Dynamique build computed");
           return "/layouts-sections/" + this.etapes[idEtape] + "/" + idEtape;
         } else return "/login";
       } else {
@@ -104,30 +109,9 @@ export default {
     previewStep() {
       const idEtape = parseInt(this.idEtape) - 1;
       if (idEtape >= 0) {
+        console.log("PREVIEW Dynamique build computed");
         return "/layouts-sections/" + this.etapes[idEtape] + "/" + idEtape;
       } else return "/formation";
-    },
-    form() {
-      if (this.keySections) {
-        const fr = this.layout_paragraphs[this.keySections].form;
-        return fr;
-      } else return {};
-    },
-    form_sort() {
-      if (this.keySections) {
-        const fr = this.layout_paragraphs[this.keySections].form_sort;
-        return fr;
-      } else return {};
-    },
-    model() {
-      if (
-        this.keySections &&
-        this.layout_paragraphs[this.keySections] &&
-        this.layout_paragraphs[this.keySections].model
-      ) {
-        const md = this.layout_paragraphs[this.keySections].model;
-        return md;
-      } else return {};
     },
     headerBlock() {
       const datas = { title: "", text: "" };
@@ -147,36 +131,24 @@ export default {
       }
       return datas;
     },
+    // rebuildFields() {
+    //   if (this.keySections) {
+    //     console.log(" Maj du lien keySections : ", this.keySections);
+    //     this.$store.dispatch("storeForm/buildFieldsDynamiqueStep");
+    //     return this.keySections;
+    //   } else return 0;
+    // },
+  },
+  watch: {
+    keySections() {
+      console.log(" Maj du lien keySections : ", this.keySections);
+      this.$store.dispatch("storeForm/buildFieldsDynamiqueStep");
+    },
   },
   mounted() {
     //
   },
   methods: {
-    buildFields() {
-      const fields = [];
-      loadField.getConfig(request);
-      if (this.form_sort)
-        this.form_sort.forEach((field) => {
-          fields.push({
-            template: loadField.getField(field),
-            field: field,
-            model: this.model,
-          });
-        });
-      return fields;
-    },
-    buildFieldsOld() {
-      const fields = [];
-      loadField.getConfig(request);
-      for (const i in this.form) {
-        fields.push({
-          template: loadField.getField(this.form[i]),
-          field: this.form[i],
-          model: this.model,
-        });
-      }
-      return fields;
-    },
     /**
      * --//
      */
@@ -186,39 +158,6 @@ export default {
     },
     closeModal() {
       this.manageModal = false;
-    },
-    addNewValue(value, render) {
-      //console.log("addNewValue : ", render, "\n", value);
-      const vals =
-        this.layout_paragraphs[this.keySections].model[render.field.name];
-      // Specifiquement à cette environnement, on ne peut pas mettre à jour le computed, this.model
-      // On met à jour directement, la donnée present dans le layout.
-      vals.push(value);
-      this.$store.dispatch("storeForm/setValue", {
-        value: vals,
-        fieldName: render.field.name,
-      });
-    },
-    removeField(index, render) {
-      this.model[render.field.name].splice(index, 1);
-    },
-    array_move(evt, render) {
-      console.log(" Evt : ", evt, "\n Render : ", render);
-      //if (evt.oldIndex == null || evt.newIndex == null) return;
-      const moveItem = (arr, fromIndex, toIndex) => {
-        let itemRemoved = arr.splice(fromIndex, 1); // assign the removed item as an array
-        arr.splice(toIndex, 0, itemRemoved[0]); // insert itemRemoved into the target index
-        return arr;
-      };
-      const vals = moveItem(
-        this.model[render.field.name],
-        evt.oldIndex,
-        evt.newIndex
-      );
-      this.$store.dispatch("storeForm/setValue", {
-        value: vals,
-        fieldName: render.field.name,
-      });
     },
   },
 };

@@ -12,8 +12,8 @@
       </div>
 
       <loginRegister
-        action_after_login="emit_even"
-        model_register_form="generate_password"
+        actionAfterLogin="emit_even"
+        modelRegisterForm="generate_password"
       >
         <template #condition_utilisation>
           <p class="text-secondary">
@@ -34,7 +34,7 @@ export default {
   name: "EtapeLogin",
   components: {
     loginRegister: () => {
-      return import("drupal-vuejs/src/App/components/loginRegister.vue");
+      return import("drupal-vuejs/src/App/components/LoginRegister.vue");
     },
   },
   computed: {

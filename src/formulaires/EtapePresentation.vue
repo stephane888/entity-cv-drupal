@@ -1,5 +1,5 @@
 <template>
-  <div :SubDomain="SubDomain">
+  <div>
     <ContainerPage>
       <template #entete>
         <hbk-button @click="openModal"> Conseils </hbk-button>
@@ -14,14 +14,26 @@
 
       <h4 class="font-weight-bold">Coordonnées</h4>
       <component
-        :is="render.template"
-        v-for="(render, k) in buildFields()"
-        :key="k"
-        :field="render.field"
-        :model="render.model"
-        :class-css="['mb-5']"
-        namespace-store="storeForm"
-      ></component>
+        :is="container.template"
+        v-for="(container, i) in fields"
+        :key="i"
+        :entity="container.entity"
+        :class-entity="['pt-1']"
+      >
+        <component
+          :is="render.template"
+          v-for="(render, k) in container.fields"
+          :key="k"
+          :field="render.field"
+          :model="render.model"
+          :entities="render.entities"
+          :class-css="['mb-5']"
+          :parent-name="i + '.entity.'"
+          :parent-child-name="i + '.entities.'"
+          namespace-store="storeForm"
+          @array_move="array_move($event, render)"
+        ></component>
+      </component>
       <template #app-footer>
         <div>
           <router-link to="/experience">
@@ -51,9 +63,7 @@
 
 <script>
 import modalForm from "./modalForm.vue";
-import { mapState, mapGetters } from "vuex";
-import loadField from "components_h_vuejs/src/components/fieldsDrupal/loadField";
-import request from "../request";
+import { mapState } from "vuex";
 export default {
   name: "EtapePresentation",
   components: {
@@ -67,38 +77,11 @@ export default {
   },
   computed: {
     ...mapState("storeForm", {
-      form: (state) => state.presentaton.form,
-      model: (state) => state.presentaton.model,
-      form_sort: (state) => state.presentaton.form_sort,
+      fields: (state) => state.EntitiesForm[0].entities.presentation,
+      building_fields: (state) => state.building_fields,
     }),
-    // ...mapGetters({
-    //   testGet: "storeForm/testGet",
-    //   SubDomain: "storeForm/SubDomain",
-    // }),
-    // ...mapGetters("storeForm", ["testGet", "SubDomain"]),
-    // ...mapGetters("storeForm", {
-    //   testGet: "testGet",
-    //   SubDomain: "SubDomain",
-    // }),
-    ...mapGetters(["SubDomain"]),
   },
   methods: {
-    buildFields() {
-      const fields = [];
-      loadField.getConfig(request);
-      if (this.form_sort)
-        this.form_sort.forEach((field) => {
-          fields.push({
-            template: loadField.getField(field),
-            field: field,
-            model: this.model,
-          });
-        });
-      return fields;
-    },
-    /**
-     * --//
-     */
     openModal() {
       if (this.manageModal) this.manageModal = false;
       else this.manageModal = true;

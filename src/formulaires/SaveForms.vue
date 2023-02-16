@@ -107,7 +107,7 @@
           size="lg"
           @click="saveCv"
         >
-          Crrer votre CV
+          Créer votre CV
         </hbk-button>
       </div>
     </ContainerPage>

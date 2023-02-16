@@ -54,32 +54,40 @@ export default new Vuex.Store({
         step: "generate_style",
       },
     ],
-    // utilisateur connecter.
+    // Utilisateur connecter.
     user: {},
     // Contient les textes traduites.
     strings: {},
     //
     messages: { errors: [], warnings: [] },
+    // Use by module login.
+    form: {
+      name: [{ value: "" }],
+      mail: [{ value: "" }],
+    },
   },
   getters: {
     /**
      * Les identifiants de champs doivent prevenir du model.
      */
     SubDomain: (state) => {
-      if (state.storeForm.presentaton.model) {
+      if (state.storeForm.presentaton[0].entity) {
         var str = "";
         if (
-          state.storeForm.presentaton.model.field_email &&
-          state.storeForm.presentaton.model.field_email[0] &&
-          state.storeForm.presentaton.model.field_email[0].value
+          state.storeForm.presentaton[0].entity.field_email &&
+          state.storeForm.presentaton[0].entity.field_email[0] &&
+          state.storeForm.presentaton[0].entity.field_email[0].value
         )
-          str += state.storeForm.presentaton.model.field_email[0].value;
+          str += state.storeForm.presentaton[0].entity.field_email[0].value;
         if (
-          state.storeForm.presentaton.model.field_phone &&
-          state.storeForm.presentaton.model.field_phone[0] &&
-          state.storeForm.presentaton.model.field_phone[0].value
+          state.storeForm.presentaton[0].entity.field_phone &&
+          state.storeForm.presentaton[0].entity.field_phone[0] &&
+          state.storeForm.presentaton[0].entity.field_phone[0].value
         )
-          str += " " + state.storeForm.presentaton.model.field_phone[0].value;
+          str +=
+            " " + state.storeForm.presentaton[0].entity.field_phone[0].value;
+
+        console.log("SubDomain : ", str);
         if (str != "") return str;
         else return null;
       } else return null;
@@ -88,14 +96,14 @@ export default new Vuex.Store({
      * Les identifiants de champs doivent prevenir du model.
      */
     GetNom: (state) => {
-      if (state.storeForm.presentaton.model) {
+      if (state.storeForm.presentaton[0].entity) {
         var str = null;
         if (
-          state.storeForm.presentaton.model.field_phone &&
-          state.storeForm.presentaton.model.field_phone[0] &&
-          state.storeForm.presentaton.model.field_phone[0].value
+          state.storeForm.presentaton[0].entity.field_phone &&
+          state.storeForm.presentaton[0].entity.field_phone[0] &&
+          state.storeForm.presentaton[0].entity.field_phone[0].value
         )
-          str = state.storeForm.presentaton.model.field_phone[0].value;
+          str = state.storeForm.presentaton[0].entity.field_phone[0].value;
         return str;
       } else return null;
     },
@@ -103,31 +111,40 @@ export default new Vuex.Store({
      * Les identifiants de champs doivent pro-venir du model.
      */
     GetPreNom: (state) => {
-      if (state.storeForm.presentaton.model) {
+      if (state.storeForm.presentaton[0].entity) {
         var str = null;
         if (
-          state.storeForm.presentaton.model.field_email &&
-          state.storeForm.presentaton.model.field_email[0] &&
-          state.storeForm.presentaton.model.field_email[0].value
+          state.storeForm.presentaton[0].entity.field_email &&
+          state.storeForm.presentaton[0].entity.field_email[0] &&
+          state.storeForm.presentaton[0].entity.field_email[0].value
         )
-          str = state.storeForm.presentaton.model.field_email[0].value;
+          str = state.storeForm.presentaton[0].entity.field_email[0].value;
         return str;
       } else return null;
     },
     /**
-     * Les identifiants de champs doivent provenir du model.
+     * Returne les etapes en fonction des données recus.
      */
     etapes: (state) => {
       return Object.keys(state.storeForm.layout_paragraphs);
     },
+    /**
+     * Semble plus necessaire car...
+     * @param {*} state
+     * @returns
+     */
     modelDynamique: (state) => {
       if (
         router.history.current.params &&
         router.history.current.params.keySections &&
         state.storeForm.layout_paragraphs
       ) {
+        console.log(
+          "router.history.current.params: ",
+          router.history.current.params
+        );
         const keySections = router.history.current.params.keySections;
-        return state.storeForm.layout_paragraphs[keySections].model;
+        return state.storeForm.layout_paragraphs[keySections].entity;
       } else return {};
     },
   },
@@ -179,8 +196,37 @@ export default new Vuex.Store({
       });
     },
     getSubDomain(context) {
+      console.log("getSubDomain : ", context.getters);
       if (context.getters.SubDomain) return context.getters.SubDomain;
       else throw new "Nom de domaine non definit"();
+    },
+    saveEntities({ commit, state }) {
+      return new Promise((resolv, reject) => {
+        commit("ACTIVE_RUNNING");
+        generateField
+          .getNumberEntities(state.currentEntityForm)
+          .then((numbers) => {
+            state.run_entity.numbers = numbers;
+            generateField
+              .prepareSaveEntities(
+                this,
+                state.currentEntityForm,
+                state.run_entity
+              )
+              .then((resp) => {
+                commit("DISABLE_RUNNING");
+                resolv(resp);
+              })
+              .catch((er) => {
+                commit("DISABLE_RUNNING");
+                reject(er);
+              });
+          })
+          .catch((er) => {
+            commit("DISABLE_RUNNING");
+            reject(er);
+          });
+      });
     },
   },
   modules: { storeForm: storeForm },

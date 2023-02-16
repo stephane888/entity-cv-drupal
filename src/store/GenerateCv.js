@@ -45,6 +45,7 @@ export default {
             })
             .catch((resp) => {
               step.status = "error";
+              console.log("resp : ", resp);
               this.runErrorsMessages(resp);
             });
           break;
@@ -265,39 +266,39 @@ export default {
   CreateContents(state) {
     return new Promise((resolv, reject) => {
       const presentaton = () => {
-        state.storeForm.presentaton.model.field_domain_access = [
+        state.storeForm.presentaton.entity.field_domain_access = [
           { target_id: this.domainRegister.id },
         ];
-        state.storeForm.presentaton.model.field_domain_source = [
+        state.storeForm.presentaton.entity.field_domain_source = [
           { target_id: this.domainRegister.id },
         ];
         return this.bPost(
           "/vuejs-entity/entity/save-duplicate-ref/paragraph",
-          state.storeForm.presentaton.model
+          state.storeForm.presentaton.entity
         );
       };
       const experience = () => {
-        state.storeForm.experience.model.field_domain_access = [
+        state.storeForm.experience.entity.field_domain_access = [
           { target_id: this.domainRegister.id },
         ];
-        state.storeForm.experience.model.field_domain_source = [
+        state.storeForm.experience.entity.field_domain_source = [
           { target_id: this.domainRegister.id },
         ];
         return this.bPost(
           "/vuejs-entity/entity/save-duplicate-ref/paragraph",
-          state.storeForm.experience.model
+          state.storeForm.experience.entity
         );
       };
       const formation = () => {
-        state.storeForm.formation.model.field_domain_access = [
+        state.storeForm.formation.entity.field_domain_access = [
           { target_id: this.domainRegister.id },
         ];
-        state.storeForm.formation.model.field_domain_source = [
+        state.storeForm.formation.entity.field_domain_source = [
           { target_id: this.domainRegister.id },
         ];
         return this.bPost(
           "/vuejs-entity/entity/save-duplicate-ref/paragraph",
-          state.storeForm.formation.model
+          state.storeForm.formation.entity
         );
       };
       // for layout_paragraphs
@@ -305,15 +306,15 @@ export default {
       for (const i in state.storeForm.layout_paragraphs) {
         promises.push(
           new Promise((resolv, reject) => {
-            state.storeForm.layout_paragraphs[i].model.field_domain_access = [
+            state.storeForm.layout_paragraphs[i].entity.field_domain_access = [
               { target_id: this.domainRegister.id },
             ];
-            state.storeForm.layout_paragraphs[i].model.field_domain_source = [
+            state.storeForm.layout_paragraphs[i].entity.field_domain_source = [
               { target_id: this.domainRegister.id },
             ];
             this.bPost(
               "/vuejs-entity/entity/save-duplicate-ref/paragraph",
-              state.storeForm.layout_paragraphs[i].model
+              state.storeForm.layout_paragraphs[i].entity
             )
               .then((resp) => {
                 resolv({ target_id: resp.data.id[0].value });
@@ -423,10 +424,10 @@ export default {
   createBlockContentHeader(state) {
     return new Promise((resolv, reject) => {
       console.log(" state.storeForm : ", state.storeForm);
-      state.storeForm.entete_paragraph.model.field_domain_access = [
+      state.storeForm.entete_paragraph.entity.field_domain_access = [
         { target_id: this.domainRegister.id },
       ];
-      state.storeForm.entete_paragraph.model.field_domain_source = [
+      state.storeForm.entete_paragraph.entity.field_domain_source = [
         { target_id: this.domainRegister.id },
       ];
       // Requis car le contenu de la page d'accueil ne s'active pas toujours.
@@ -437,7 +438,7 @@ export default {
             this.bPost(
               "/vuejs-entity/entity/add-paragrph-in-entity/block_content/header",
               {
-                paragraph: state.storeForm.entete_paragraph.model,
+                paragraph: state.storeForm.entete_paragraph.entity,
                 entity: {
                   info: [{ value: "Entete" }],
                   field_domain_access: [{ target_id: this.domainRegister.id }],
@@ -536,7 +537,7 @@ export default {
           console.log("resp : ", resp);
           if (resp.data.menu && resp.data.menu.id) {
             // On met à jour le champs "field_reference_menu" au niveau de l'object du header
-            state.storeForm.entete_paragraph.model.field_reference_menu = [
+            state.storeForm.entete_paragraph.entity.field_reference_menu = [
               { target_id: resp.data.menu.id },
             ];
             resolv();
@@ -604,16 +605,16 @@ export default {
   },
   // On ajoute la config pour le footer du layout.
   createBlockContentFooter(state) {
-    state.storeForm.footer_paragraph.model.field_domain_access = [
+    state.storeForm.footer_paragraph.entity.field_domain_access = [
       { target_id: this.domainRegister.id },
     ];
-    state.storeForm.footer_paragraph.model.field_domain_source = [
+    state.storeForm.footer_paragraph.entity.field_domain_source = [
       { target_id: this.domainRegister.id },
     ];
     return this.bPost(
       "/vuejs-entity/entity/add-paragrph-in-entity/block_content/footer",
       {
-        paragraph: state.storeForm.footer_paragraph.model,
+        paragraph: state.storeForm.footer_paragraph.entity,
         entity: {
           info: [{ value: " Pied de page " }],
           field_domain_access: [{ target_id: this.domainRegister.id }],

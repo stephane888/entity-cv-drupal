@@ -12,19 +12,26 @@
           et pertinents.
         </div>
       </HCardIcon>
-
       <component
-        :is="render.template"
-        v-for="(render, k) in buildFields()"
-        :key="k"
-        :field="render.field"
-        :model="render.model"
-        :class-css="['mb-5']"
-        namespace-store="storeForm"
-        @addNewValue="addNewValue($event, render)"
-        @removeField="removeField($event, render)"
-        @array_move="array_move($event, render)"
-      ></component>
+        :is="container.template"
+        v-for="(container, i) in fields"
+        :key="i"
+        :entity="container.entity"
+        :class-entity="['pt-1']"
+      >
+        <component
+          :is="render.template"
+          v-for="(render, k) in container.fields"
+          :key="k"
+          :field="render.field"
+          :model="render.model"
+          :entities="render.entities"
+          :class-css="['mb-5']"
+          :parent-name="i + '.entity.'"
+          :parent-child-name="i + '.entities.'"
+          namespace-store="storeForm"
+        ></component>
+      </component>
       <template #app-footer>
         <div class="w-100 d-flex justify-content-between">
           <router-link to="/presentation">
@@ -65,8 +72,6 @@
 <script>
 import modalForm from "./modalForm.vue";
 import { mapState } from "vuex";
-import loadField from "components_h_vuejs/src/components/fieldsDrupal/loadField";
-import request from "../request";
 export default {
   name: "EtapeExperience",
   components: {
@@ -80,40 +85,14 @@ export default {
   },
   computed: {
     ...mapState("storeForm", {
-      form: (state) => state.experience.form,
-      model: (state) => state.experience.model,
-      form_sort: (state) => state.experience.form_sort,
+      fields: (state) => state.fields_experience,
+      building_fields: (state) => state.building_fields,
     }),
     currentRoute() {
       return this.$router.history.current.path;
     },
   },
   methods: {
-    buildFields() {
-      const fields = [];
-      loadField.getConfig(request);
-      if (this.form_sort)
-        this.form_sort.forEach((field) => {
-          fields.push({
-            template: loadField.getField(field),
-            field: field,
-            model: this.model,
-          });
-        });
-      return fields;
-    },
-    buildFieldsOld() {
-      const fields = [];
-      loadField.getConfig(request);
-      for (const i in this.form) {
-        fields.push({
-          template: loadField.getField(this.form[i]),
-          field: this.form[i],
-          model: this.model,
-        });
-      }
-      return fields;
-    },
     /**
      * --//
      */
@@ -123,28 +102,6 @@ export default {
     },
     closeModal() {
       this.manageModal = false;
-    },
-    addNewValue(value, render) {
-      this.model[render.field.name].push(value);
-    },
-    removeField(index, render) {
-      this.model[render.field.name].splice(index, 1);
-    },
-    array_move(evt, render) {
-      const moveItem = (arr, fromIndex, toIndex) => {
-        let itemRemoved = arr.splice(fromIndex, 1); // assign the removed item as an array
-        arr.splice(toIndex, 0, itemRemoved[0]); // insert itemRemoved into the target index
-        return arr;
-      };
-      const vals = moveItem(
-        this.model[render.field.name],
-        evt.oldIndex,
-        evt.newIndex
-      );
-      this.$store.dispatch("storeForm/setValue", {
-        value: vals,
-        fieldName: render.field.name,
-      });
     },
   },
 };

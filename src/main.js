@@ -13,7 +13,8 @@ Vue.use(cards);
 //
 import ContainerPage from "./views/ContainerPage.vue";
 Vue.component("ContainerPage", ContainerPage);
-//
+
+// Config vee-validate
 import { ValidationObserver, ValidationProvider, extend } from "vee-validate";
 Vue.component("ValidationObserver", ValidationObserver);
 Vue.component("ValidationProvider", ValidationProvider);

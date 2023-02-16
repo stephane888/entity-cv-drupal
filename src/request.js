@@ -10,4 +10,5 @@ export default {
       ? window.drupalSettings.path.currentLanguage
       : null,
   TestDomain: "http://wb-horizon.kksa",
+  debug: true,
 };
