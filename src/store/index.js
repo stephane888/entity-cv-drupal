@@ -123,10 +123,18 @@ export default new Vuex.Store({
       } else return null;
     },
     /**
-     * Returne les etapes en fonction des données recus.
+     * Retourne les etapes en fonction des données recus.
      */
     etapes: (state) => {
-      return Object.keys(state.storeForm.layout_paragraphs);
+      if (
+        state.storeForm.EntitiesForm[0] &&
+        state.storeForm.EntitiesForm[0].entities &&
+        state.storeForm.EntitiesForm[0].entities.layout_paragraphs
+      ) {
+        return Object.keys(
+          state.storeForm.EntitiesForm[0].entities.layout_paragraphs
+        );
+      } else return [];
     },
     /**
      * Semble plus necessaire car...

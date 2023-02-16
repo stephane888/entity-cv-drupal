@@ -28,8 +28,8 @@
           :model="render.model"
           :entities="render.entities"
           :class-css="['mb-5']"
-          :parent-name="i + '.entity.'"
-          :parent-child-name="i + '.entities.'"
+          :parent-name="'0.entities.presentation.' + i + '.entity.'"
+          :parent-child-name="'0.entities.presentation.' + i + '.entities.'"
           namespace-store="storeForm"
           @array_move="array_move($event, render)"
         ></component>
@@ -37,12 +37,7 @@
       <template #app-footer>
         <div>
           <router-link to="/experience">
-            <hbk-button
-              icon="save"
-              variant="outline-info"
-              icon-variant=""
-              @click="$store.dispatch('storeForm/updateLocalStorage')"
-            >
+            <hbk-button icon="save" variant="outline-info" icon-variant="">
               Etape suivante
             </hbk-button>
           </router-link>
@@ -64,6 +59,7 @@
 <script>
 import modalForm from "./modalForm.vue";
 import { mapState } from "vuex";
+import generateField from "components_h_vuejs/src/js/FormUttilities";
 export default {
   name: "EtapePresentation",
   components: {
@@ -77,8 +73,24 @@ export default {
   },
   computed: {
     ...mapState("storeForm", {
-      fields: (state) => state.EntitiesForm[0].entities.presentation,
       building_fields: (state) => state.building_fields,
+      EntitiesForm: (state) => state.EntitiesForm,
+      fields() {
+        var fields = [];
+        if (
+          this.EntitiesForm &&
+          this.EntitiesForm[0] &&
+          this.EntitiesForm[0].entities &&
+          this.EntitiesForm[0].entities.presentation
+        ) {
+          generateField.generateFields(
+            this.EntitiesForm[0].entities.presentation,
+            fields,
+            ""
+          );
+        }
+        return fields;
+      },
     }),
   },
   methods: {

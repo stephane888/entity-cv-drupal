@@ -9,20 +9,24 @@
         <div v-html="headerBlock.text"></div>
       </HCardIcon>
       <component
-        :is="fields_layout_dynamique.template"
-        :entity="fields_layout_dynamique.entity"
+        :is="container.template"
+        v-for="(container, i) in fields"
+        :key="i"
+        :entity="container.entity"
         :class-entity="['pt-1']"
       >
         <component
           :is="render.template"
-          v-for="(render, k) in fields_layout_dynamique.fields"
+          v-for="(render, k) in container.fields"
           :key="k"
           :field="render.field"
           :model="render.model"
           :entities="render.entities"
           :class-css="['mb-5']"
-          :parent-name="keySections + '.entity.'"
-          :parent-child-name="keySections + '.entities.'"
+          :parent-name="'0.entities.layout_paragraphs.' + i + '.entity.'"
+          :parent-child-name="
+            '0.entities.layout_paragraphs.' + i + '.entities.'
+          "
           namespace-store="storeForm"
         ></component>
       </component>
@@ -63,7 +67,7 @@ import modalForm from "./modalForm.vue";
 import { mapState, mapGetters } from "vuex";
 // import loadField from "components_h_vuejs/src/components/fieldsDrupal/loadField";
 // import request from "../request";
-// import generateField from "components_h_vuejs/src/js/FormUttilities";
+import generateField from "components_h_vuejs/src/js/FormUttilities";
 export default {
   name: "EtapeDynamiqueSection",
   components: {
@@ -83,13 +87,40 @@ export default {
     return {
       titleModal: "",
       manageModal: false,
-      container: {},
     };
   },
 
   computed: {
     ...mapState("storeForm", {
-      fields_layout_dynamique: (state) => state.fields_layout_dynamique,
+      building_fields: (state) => state.building_fields,
+      EntitiesForm: (state) => state.EntitiesForm,
+      fields() {
+        var fields = [];
+        if (
+          this.keySections &&
+          this.EntitiesForm &&
+          this.EntitiesForm[0] &&
+          this.EntitiesForm[0].entities &&
+          this.EntitiesForm[0].entities.layout_paragraphs
+        ) {
+          //
+          console.log(" EntitiesForm : ", this.EntitiesForm);
+
+          var keySections = 0;
+          if (
+            this.$router.history.current.params &&
+            this.$router.history.current.params.keySections
+          ) {
+            keySections = this.$router.history.current.params.keySections;
+          }
+          generateField.generateFields(
+            [this.EntitiesForm[0].entities.layout_paragraphs[keySections]],
+            fields,
+            ""
+          );
+        }
+        return fields;
+      },
       user: (state) => state.user,
     }),
     ...mapGetters(["etapes"]),
@@ -139,12 +170,12 @@ export default {
     //   } else return 0;
     // },
   },
-  watch: {
-    keySections() {
-      console.log(" Maj du lien keySections : ", this.keySections);
-      this.$store.dispatch("storeForm/buildFieldsDynamiqueStep");
-    },
-  },
+  // watch: {
+  //   keySections() {
+  //     console.log(" Maj du lien keySections : ", this.keySections);
+  //     //this.$store.dispatch("storeForm/buildFieldsDynamiqueStep");
+  //   },
+  // },
   mounted() {
     //
   },

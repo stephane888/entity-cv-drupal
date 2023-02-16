@@ -27,8 +27,8 @@
           :model="render.model"
           :entities="render.entities"
           :class-css="['mb-5']"
-          :parent-name="i + '.entity.'"
-          :parent-child-name="i + '.entities.'"
+          :parent-name="'0.entities.experience.' + i + '.entity.'"
+          :parent-child-name="'0.entities.experience.' + i + '.entities.'"
           namespace-store="storeForm"
         ></component>
       </component>
@@ -45,12 +45,7 @@
             </hbk-button>
           </router-link>
           <router-link to="/formation">
-            <hbk-button
-              icon="save"
-              variant="outline-info"
-              icon-variant=""
-              @click="$store.dispatch('storeForm/updateLocalStorage')"
-            >
+            <hbk-button icon="save" variant="outline-info" icon-variant="">
               Etape suivante
             </hbk-button>
           </router-link>
@@ -72,6 +67,7 @@
 <script>
 import modalForm from "./modalForm.vue";
 import { mapState } from "vuex";
+import generateField from "components_h_vuejs/src/js/FormUttilities";
 export default {
   name: "EtapeExperience",
   components: {
@@ -85,8 +81,24 @@ export default {
   },
   computed: {
     ...mapState("storeForm", {
-      fields: (state) => state.fields_experience,
       building_fields: (state) => state.building_fields,
+      EntitiesForm: (state) => state.EntitiesForm,
+      fields() {
+        var fields = [];
+        if (
+          this.EntitiesForm &&
+          this.EntitiesForm[0] &&
+          this.EntitiesForm[0].entities &&
+          this.EntitiesForm[0].entities.experience
+        ) {
+          generateField.generateFields(
+            this.EntitiesForm[0].entities.experience,
+            fields,
+            ""
+          );
+        }
+        return fields;
+      },
     }),
     currentRoute() {
       return this.$router.history.current.path;

@@ -27,8 +27,8 @@
           :model="render.model"
           :entities="render.entities"
           :class-css="['mb-5']"
-          :parent-name="i + '.entity.'"
-          :parent-child-name="i + '.entities.'"
+          :parent-name="'0.entities.formation.' + i + '.entity.'"
+          :parent-child-name="'0.entities.formation.' + i + '.entities.'"
           namespace-store="storeForm"
         ></component>
       </component>
@@ -45,12 +45,7 @@
             </hbk-button>
           </router-link>
           <router-link :to="nextStep">
-            <hbk-button
-              icon="save"
-              variant="outline-info"
-              icon-variant=""
-              @click="$store.dispatch('storeForm/updateLocalStorage')"
-            >
+            <hbk-button icon="save" variant="outline-info" icon-variant="">
               Etape suivante
             </hbk-button>
           </router-link>
@@ -73,6 +68,7 @@
 <script>
 import modalForm from "./modalForm.vue";
 import { mapState, mapGetters } from "vuex";
+import generateField from "components_h_vuejs/src/js/FormUttilities";
 export default {
   name: "EtapeFormation",
   components: {
@@ -86,8 +82,24 @@ export default {
   },
   computed: {
     ...mapState("storeForm", {
-      fields: (state) => state.fields_formation,
       building_fields: (state) => state.building_fields,
+      EntitiesForm: (state) => state.EntitiesForm,
+      fields() {
+        var fields = [];
+        if (
+          this.EntitiesForm &&
+          this.EntitiesForm[0] &&
+          this.EntitiesForm[0].entities &&
+          this.EntitiesForm[0].entities.formation
+        ) {
+          generateField.generateFields(
+            this.EntitiesForm[0].entities.formation,
+            fields,
+            ""
+          );
+        }
+        return fields;
+      },
       user: (state) => state.user,
       layout_paragraphs: (state) => state.layout_paragraphs,
     }),
