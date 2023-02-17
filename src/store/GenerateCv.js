@@ -1,6 +1,7 @@
 import store from "./index";
 import request from "../request";
 import { limit } from "stringz";
+import generateField from "components_h_vuejs/src/js/FormUttilities";
 
 export default {
   ...request,
@@ -53,6 +54,7 @@ export default {
           this.RegisterDomaine()
             .then((result) => {
               this.domainRegister = result.data.domain;
+              generateField.domainRegister = result.data.domain;
               // On lance la creation sur OVH, apres cette etape.(car les deux etapes modifie la meme entité)
               if (
                 this.domain_ovh_entity.id &&
@@ -128,26 +130,60 @@ export default {
         case "layout_header":
           step.status = "run";
           if (this.domainRegister.id) {
-            this.createBlockContentHeader(state)
-              .then((resp) => {
-                var passNext = () => {
-                  setTimeout(() => {
-                    step.status = "ok";
-                    this.currentBuildStep++;
-                    this.runStep(steps, state);
-                  }, 500);
-                };
-                this.addEntityToBlock(resp.data, "top_header")
-                  .then(() => {
-                    passNext();
+            // this.createBlockContentHeader(state)
+            //   .then((resp) => {
+            //     var passNext = () => {
+            //       setTimeout(() => {
+            //         step.status = "ok";
+            //         this.currentBuildStep++;
+            //         this.runStep(steps, state);
+            //       }, 500);
+            //     };
+            //     this.addEntityToBlock(resp.data, "top_header")
+            //       .then(() => {
+            //         passNext();
+            //       })
+            //       .catch(() => {
+            //         passNext();
+            //       });
+            //   })
+            //   .catch((resp) => {
+            //     step.status = "error";
+            //     this.runErrorsMessages(resp);
+            //   });
+            this.CreateMenus(state)
+              .then(() => {
+                this.createParagraphHeader(state)
+                  .then((resp) => {
+                    var passNext = () => {
+                      setTimeout(() => {
+                        step.status = "ok";
+                        this.currentBuildStep++;
+                        this.runStep(steps, state);
+                      }, 500);
+                    };
+                    this.addEntityToBlock(
+                      resp,
+                      "paragraph",
+                      "top_header",
+                      "entete"
+                    )
+                      .then(() => {
+                        passNext();
+                      })
+                      .catch((er) => {
+                        step.status = "error";
+                        this.runErrorsMessages(er);
+                      });
                   })
-                  .catch(() => {
-                    passNext();
+                  .catch((er) => {
+                    step.status = "error";
+                    this.runErrorsMessages(er);
                   });
               })
-              .catch((resp) => {
+              .catch((er) => {
                 step.status = "error";
-                this.runErrorsMessages(resp);
+                this.runErrorsMessages(er);
               });
           } else {
             step.status = "error";
@@ -158,7 +194,30 @@ export default {
         case "layout_footer":
           step.status = "run";
           if (this.domainRegister.id) {
-            this.createBlockContentFooter(state)
+            // this.createBlockContentFooter(state)
+            //   .then((resp) => {
+            //     var passNext = () => {
+            //       setTimeout(() => {
+            //         step.status = "ok";
+            //         this.currentBuildStep++;
+            //         this.runStep(steps, state);
+            //       }, 500);
+            //     };
+            //     this.addEntityToBlock(resp.data, "footer")
+            //       .then(() => {
+            //         passNext();
+            //       })
+            //       .catch(() => {
+            //         passNext();
+            //       });
+            //   })
+            //   .catch((resp) => {
+            //     step.status = "error";
+            //     this.runErrorsMessages(resp);
+            //   });
+            // Requis car le contenu de la page d'accueil ne s'active pas toujours.
+            this.addDefaultBlockInRegion();
+            this.createParagraphFooter(state)
               .then((resp) => {
                 var passNext = () => {
                   setTimeout(() => {
@@ -167,17 +226,18 @@ export default {
                     this.runStep(steps, state);
                   }, 500);
                 };
-                this.addEntityToBlock(resp.data, "footer")
+                this.addEntityToBlock(resp, "paragraph", "footer", "footer")
                   .then(() => {
                     passNext();
                   })
-                  .catch(() => {
-                    passNext();
+                  .catch((er) => {
+                    step.status = "error";
+                    this.runErrorsMessages(er);
                   });
               })
-              .catch((resp) => {
+              .catch((er) => {
                 step.status = "error";
-                this.runErrorsMessages(resp);
+                this.runErrorsMessages(er);
               });
           } else {
             step.status = "error";
@@ -379,6 +439,96 @@ export default {
         });
     });
   },
+  /**
+   * Creation du paragraph d'entete.
+   * Les paraphages doivent suivrent la meme logique de creation de contenu que le systeme matrice,
+   * car cela permet de modifier les données et les sous données.
+   *
+   * @param {*} state
+   * @returns
+   */
+  createParagraphHeader(state) {
+    return new Promise((resolv, reject) => {
+      generateField
+        .getNumberEntities(state.storeForm.entete_paragraph)
+        .then((numbers) => {
+          var vals = {
+            numbers: numbers,
+            creates: 0,
+            page: "",
+          };
+          generateField
+            .prepareSaveEntities(
+              store,
+              state.storeForm.entete_paragraph,
+              vals,
+              true
+            )
+            .then((entities) => {
+              // car on doit avoir un seul niveau de données.( au niveau drupal c'est un champs de cardinalité = 1 )
+              if (entities[0] && entities[0].id) {
+                resolv(entities[0]);
+              } else
+                reject(
+                  " Une erreur s'est produite pendant la construction de l'entete "
+                );
+            })
+            .catch((er) => {
+              this.messages.warnings.push(
+                " Une erreur s'est produite pendant la sauvegarde de l'entete ..."
+              );
+              reject(er);
+            });
+        })
+        .catch((er) => {
+          this.messages.warnings.push(
+            " Impossible de determiner les sous entites de l'entete ... "
+          );
+          reject(er);
+        });
+    });
+  },
+  createParagraphFooter(state) {
+    return new Promise((resolv, reject) => {
+      generateField
+        .getNumberEntities(state.storeForm.footer_paragraph)
+        .then((numbers) => {
+          var vals = {
+            numbers: numbers,
+            creates: 0,
+            page: "",
+          };
+          generateField
+            .prepareSaveEntities(
+              store,
+              state.storeForm.footer_paragraph,
+              vals,
+              true
+            )
+            .then((entities) => {
+              // car on doit avoir un seul niveau de données.( au niveau drupal c'est un champs de cardinalité = 1 )
+              if (entities[0] && entities[0].id) {
+                resolv(entities[0]);
+              } else
+                reject(
+                  " Une erreur s'est produite pendant la construction du footer "
+                );
+            })
+            .catch((er) => {
+              this.messages.warnings.push(
+                " Une erreur s'est produite pendant la sauvegarde du footer ..."
+              );
+              reject(er);
+            });
+        })
+        .catch((er) => {
+          this.messages.warnings.push(
+            " Impossible de determiner les sous entites du footer ... "
+          );
+          reject(er);
+        });
+    });
+  },
   //
   CreateTheme() {
     return new Promise((resolv, reject) => {
@@ -544,7 +694,7 @@ export default {
           console.log("resp : ", resp);
           if (resp.data.menu && resp.data.menu.id) {
             // On met à jour le champs "field_reference_menu" au niveau de l'object du header
-            state.storeForm.entete_paragraph.entity.field_reference_menu = [
+            state.storeForm.entete_paragraph[0].entity.field_reference_menu = [
               { target_id: resp.data.menu.id },
             ];
             resolv();
@@ -564,10 +714,62 @@ export default {
     });
   },
   /**
+   * Fonctionne avec les entites donc la colonne index est id.
+   * ( Si besoin se fait ressentir on pourrait mettre une autre fonction qui serra appelle
+   * et permettra de transferer les données essentielle et aussi de gerer nid, product_id ...)
+   * @param {*} entity
+   * @param {*} entity_type_id
+   * @param {*} region
+   * @param {*} info
+   * @returns
+   */
+  addEntityToBlock(entity, entity_type_id, region, info = "") {
+    return new Promise((resolv, reject) => {
+      console.log("addEntityToBlock : ", entity);
+      if (entity.id && entity.id[0].value) {
+        const type = entity["type"][0]["target_id"];
+        const label = info + " : " + this.domainRegister.id;
+        const id_domaine = limit(this.domainRegister.id, 20, "");
+        const id_system = limit(id_domaine + type, 30, "");
+        const id = entity.id[0].value;
+        const values = {
+          id: id_system,
+          theme: this.domainRegister.id,
+          region: region,
+          plugin: "entity_block:" + entity_type_id,
+          provider: "entity_block",
+          status: true,
+          visibility: {
+            domain: {
+              id: "domain",
+              negate: false,
+              context_mapping: {
+                domain: "@domain.current_domain_context:domain",
+              },
+              domains: {
+                [this.domainRegister.id]: this.domainRegister.id,
+              },
+            },
+          },
+          settings: {
+            id: id_system,
+            label: label,
+            label_display: false,
+            provider: "entity_block",
+            entity: id,
+            view_mode: "default",
+          },
+        };
+        console.log(" addEntityToBlock values : ", values);
+        resolv(this.bPost("/vuejs-entity/entity/add-block-in-region", values));
+      } else reject(" ID du paragraph non definit ");
+    });
+  },
+  /**
    *
    * @param {*} blockContent
    */
-  addEntityToBlock(blockContent, region) {
+  addEntityToBlockOld(blockContent, region) {
     return new Promise((resolv, reject) => {
       console.log(" addEntityToBlock : ", blockContent);
       if (blockContent["uuid"]) {

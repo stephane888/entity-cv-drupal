@@ -1,8 +1,5 @@
 import request from "../request";
 import user from "../User";
-import router from "../router/index";
-import generateField from "components_h_vuejs/src/js/FormUttilities";
-import loadField from "components_h_vuejs/src/components/fieldsDrupal/loadField";
 export default {
   namespaced: true,
   state: () => ({
@@ -135,11 +132,11 @@ export default {
 
             // Recuperation de l'entete.
             if (entities.entete_paragraph) {
-              commit("SET_HEADER", entities.entete_paragraph[0]);
+              commit("SET_HEADER", entities.entete_paragraph);
             }
             // Recuperation du footer.
             if (entities.footer_paragraph) {
-              commit("SET_FOOTER", entities.footer_paragraph[0]);
+              commit("SET_FOOTER", entities.footer_paragraph);
             }
           }, 200);
         });

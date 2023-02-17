@@ -3,6 +3,7 @@ import Vuex from "vuex";
 import storeForm from "../formulaires/storeForm";
 import saveEntity from "./GenerateCv";
 import router from "../router/index";
+import request from "../request";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -12,6 +13,8 @@ export default new Vuex.Store({
      * True, le site est encours de creation.
      */
     creation_running: false,
+    //
+    running: false,
     // Permet de determiner si la creation est terminé.
     finish_status: false,
     // Nouveau nom de domaine.
@@ -198,6 +201,12 @@ export default new Vuex.Store({
     SET_ERROR_MESSAGES(state, messages) {
       state.messages.errors = messages;
     },
+    ACTIVE_RUNNING(state) {
+      state.running = true;
+    },
+    DISABLE_RUNNING(state) {
+      state.running = false;
+    },
   },
   actions: {
     //
@@ -249,6 +258,29 @@ export default new Vuex.Store({
             commit("DISABLE_RUNNING");
             reject(er);
           });
+      });
+    },
+    saveEntity({ commit }, payload) {
+      return new Promise((resolv, reject) => {
+        commit("ACTIVE_RUNNING");
+        if (payload.entity_type_id == undefined || !payload.entity_type_id) {
+          reject("Paramettre manquant");
+        } else
+          request
+            .bPost(
+              "/apivuejs/save-entity/" + payload.entity_type_id,
+              payload.value
+            )
+            .then((resp) => {
+              console.log("resp : ", resp);
+              // setTimeout(() => {
+              console.log(" payload : ", payload);
+              resolv(resp);
+              // }, 1000);
+            })
+            .catch((er) => {
+              reject(er);
+            });
       });
     },
   },
