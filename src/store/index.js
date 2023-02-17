@@ -71,21 +71,26 @@ export default new Vuex.Store({
      * Les identifiants de champs doivent prevenir du model.
      */
     SubDomain: (state) => {
-      if (state.storeForm.presentaton[0].entity) {
+      if (
+        state.storeForm.EntitiesForm[0] &&
+        state.storeForm.EntitiesForm[0].entities
+      ) {
+        const presentation =
+          state.storeForm.EntitiesForm[0].entities.presentation[0].entity;
+
         var str = "";
         if (
-          state.storeForm.presentaton[0].entity.field_email &&
-          state.storeForm.presentaton[0].entity.field_email[0] &&
-          state.storeForm.presentaton[0].entity.field_email[0].value
+          presentation.field_email &&
+          presentation.field_email[0] &&
+          presentation.field_email[0].value
         )
-          str += state.storeForm.presentaton[0].entity.field_email[0].value;
+          str += presentation.field_email[0].value;
         if (
-          state.storeForm.presentaton[0].entity.field_phone &&
-          state.storeForm.presentaton[0].entity.field_phone[0] &&
-          state.storeForm.presentaton[0].entity.field_phone[0].value
+          presentation.field_phone &&
+          presentation.field_phone[0] &&
+          presentation.field_phone[0].value
         )
-          str +=
-            " " + state.storeForm.presentaton[0].entity.field_phone[0].value;
+          str += " " + presentation.field_phone[0].value;
 
         console.log("SubDomain : ", str);
         if (str != "") return str;
@@ -96,14 +101,19 @@ export default new Vuex.Store({
      * Les identifiants de champs doivent prevenir du model.
      */
     GetNom: (state) => {
-      if (state.storeForm.presentaton[0].entity) {
+      if (
+        state.storeForm.EntitiesForm[0] &&
+        state.storeForm.EntitiesForm[0].entities
+      ) {
+        const presentation =
+          state.storeForm.EntitiesForm[0].entities.presentation[0].entity;
         var str = null;
         if (
-          state.storeForm.presentaton[0].entity.field_phone &&
-          state.storeForm.presentaton[0].entity.field_phone[0] &&
-          state.storeForm.presentaton[0].entity.field_phone[0].value
+          presentation.field_phone &&
+          presentation.field_phone[0] &&
+          presentation.field_phone[0].value
         )
-          str = state.storeForm.presentaton[0].entity.field_phone[0].value;
+          str = presentation.field_phone[0].value;
         return str;
       } else return null;
     },
@@ -111,14 +121,19 @@ export default new Vuex.Store({
      * Les identifiants de champs doivent pro-venir du model.
      */
     GetPreNom: (state) => {
-      if (state.storeForm.presentaton[0].entity) {
+      if (
+        state.storeForm.EntitiesForm[0] &&
+        state.storeForm.EntitiesForm[0].entities
+      ) {
         var str = null;
+        const presentation =
+          state.storeForm.EntitiesForm[0].entities.presentation[0].entity;
         if (
-          state.storeForm.presentaton[0].entity.field_email &&
-          state.storeForm.presentaton[0].entity.field_email[0] &&
-          state.storeForm.presentaton[0].entity.field_email[0].value
+          presentation.field_email &&
+          presentation.field_email[0] &&
+          presentation.field_email[0].value
         )
-          str = state.storeForm.presentaton[0].entity.field_email[0].value;
+          str = presentation.field_email[0].value;
         return str;
       } else return null;
     },

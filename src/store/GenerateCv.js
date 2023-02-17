@@ -45,7 +45,6 @@ export default {
             })
             .catch((resp) => {
               step.status = "error";
-              console.log("resp : ", resp);
               this.runErrorsMessages(resp);
             });
           break;
@@ -73,8 +72,13 @@ export default {
                   " L'entité du domaine n'a pas pu etre creer "
                 );
               if (this.domainRegister.hostname) {
+                var languageId = "/";
+                languageId +=
+                  request.languageId && request.languageId != null
+                    ? request.languageId
+                    : "";
                 store.commit("SET_HOSTNAME", {
-                  domain: this.domainRegister.hostname,
+                  domain: this.domainRegister.hostname + languageId,
                   scheme: this.domainRegister.scheme,
                 });
               }
@@ -101,6 +105,7 @@ export default {
               }, this.timeWaitRun);
             })
             .catch((resp) => {
+              console.log(" CreateContents error : ", resp);
               step.status = "error";
               this.runErrorsMessages(resp);
             });
@@ -265,66 +270,64 @@ export default {
   // On va cree la page d'accueil en function de l'identifiant present dans l'url.
   CreateContents(state) {
     return new Promise((resolv, reject) => {
-      const presentaton = () => {
-        state.storeForm.presentaton.entity.field_domain_access = [
+      const EntitiesForm = state.storeForm.EntitiesForm[0].entities;
+      const presentation = () => {
+        EntitiesForm.presentation[0].entity.field_domain_access = [
           { target_id: this.domainRegister.id },
         ];
-        state.storeForm.presentaton.entity.field_domain_source = [
+        EntitiesForm.presentation[0].entity.field_domain_source = [
           { target_id: this.domainRegister.id },
         ];
         return this.bPost(
-          "/vuejs-entity/entity/save-duplicate-ref/paragraph",
-          state.storeForm.presentaton.entity
+          "/apivuejs/save-entity/paragraph",
+          EntitiesForm.presentation[0].entity
         );
       };
       const experience = () => {
-        state.storeForm.experience.entity.field_domain_access = [
+        EntitiesForm.experience[0].entity.field_domain_access = [
           { target_id: this.domainRegister.id },
         ];
-        state.storeForm.experience.entity.field_domain_source = [
+        EntitiesForm.experience[0].entity.field_domain_source = [
           { target_id: this.domainRegister.id },
         ];
         return this.bPost(
-          "/vuejs-entity/entity/save-duplicate-ref/paragraph",
-          state.storeForm.experience.entity
+          "/apivuejs/save-entity/paragraph",
+          EntitiesForm.experience[0].entity
         );
       };
       const formation = () => {
-        state.storeForm.formation.entity.field_domain_access = [
+        EntitiesForm.formation[0].entity.field_domain_access = [
           { target_id: this.domainRegister.id },
         ];
-        state.storeForm.formation.entity.field_domain_source = [
+        EntitiesForm.formation[0].entity.field_domain_source = [
           { target_id: this.domainRegister.id },
         ];
         return this.bPost(
-          "/vuejs-entity/entity/save-duplicate-ref/paragraph",
-          state.storeForm.formation.entity
+          "/apivuejs/save-entity/paragraph",
+          EntitiesForm.formation[0].entity
         );
       };
-      // for layout_paragraphs
+      // For layout_paragraphs
       const promises = [];
-      for (const i in state.storeForm.layout_paragraphs) {
+      EntitiesForm.layout_paragraphs.forEach((item) => {
         promises.push(
           new Promise((resolv, reject) => {
-            state.storeForm.layout_paragraphs[i].entity.field_domain_access = [
+            item.entity.field_domain_access = [
               { target_id: this.domainRegister.id },
             ];
-            state.storeForm.layout_paragraphs[i].entity.field_domain_source = [
+            item.entity.field_domain_source = [
               { target_id: this.domainRegister.id },
             ];
-            this.bPost(
-              "/vuejs-entity/entity/save-duplicate-ref/paragraph",
-              state.storeForm.layout_paragraphs[i].entity
-            )
+            this.bPost("/apivuejs/save-entity/paragraph", item.entity)
               .then((resp) => {
-                resolv({ target_id: resp.data.id[0].value });
+                resolv({ target_id: resp.data.id });
               })
               .catch((er) => {
                 reject(er);
               });
           })
         );
-      }
+      });
 
       //
       const idHome = window.location.pathname.split("/").pop();
@@ -340,24 +343,28 @@ export default {
         field_domain_access: [{ target_id: this.domainRegister.id }],
         field_domain_source: [{ target_id: this.domainRegister.id }],
       };
-      presentaton()
+      presentation()
         .then((resp) => {
-          values["presentation"] = [{ target_id: resp.data.id[0].value }];
+          values["presentation"] = [{ target_id: resp.data.id }];
           experience()
             .then((res) => {
-              values["experience"] = [{ target_id: res.data.id[0].value }];
+              values["experience"] = [{ target_id: res.data.id }];
               formation()
                 .then((re) => {
-                  values["formation"] = [{ target_id: re.data.id[0].value }];
-                  Promise.all(promises).then((vals) => {
-                    values["layout_paragraphs"] = vals;
-                    resolv(
-                      this.bPost(
-                        "/buildercv/entity/generate-cv/" + idHome,
-                        values
-                      )
-                    );
-                  });
+                  values["formation"] = [{ target_id: re.data.id }];
+                  Promise.all(promises)
+                    .then((vals) => {
+                      values["layout_paragraphs"] = vals;
+                      resolv(
+                        this.bPost(
+                          "/buildercv/entity/generate-cv/" + idHome,
+                          values
+                        )
+                      );
+                    })
+                    .catch((er) => {
+                      reject(er);
+                    });
                 })
                 .catch((er) => {
                   reject(er);
@@ -502,7 +509,7 @@ export default {
     return new Promise((resolv, reject) => {
       // Build menu :
       const menu = {
-        //this.domain_ovh_entity.sub_domain[0].value contient a-z0-9,
+        // this.domain_ovh_entity.sub_domain[0].value contient a-z0-9,
         id: this.domain_ovh_entity.sub_domain[0].value + "_main",
         label: this.domainRegister.id + ": menu principal",
         description: "Menu generé automatiquement",
@@ -664,6 +671,7 @@ export default {
    * @param {*} resp
    */
   runErrorsMessages(resp) {
+    console.log(" runErrorsMessages : ", resp);
     this.messages.errors.push(
       "<h3> Oups! Un problème est survenu. Veuillez réessayer </h3>"
     );

@@ -115,6 +115,7 @@ export default {
       const param = {
         id: window.location.pathname.split("/").pop(),
         entity_type_id: "model_cv",
+        duplicate: true,
       };
       request
         .bPost("/vuejs-entity/form/get-form/from/entity-id", param, {}, false)
@@ -134,11 +135,11 @@ export default {
 
             // Recuperation de l'entete.
             if (entities.entete_paragraph) {
-              commit("SET_HEADER", entities.entete_paragraph);
+              commit("SET_HEADER", entities.entete_paragraph[0]);
             }
             // Recuperation du footer.
             if (entities.footer_paragraph) {
-              commit("SET_FOOTER", entities.footer_paragraph);
+              commit("SET_FOOTER", entities.footer_paragraph[0]);
             }
           }, 200);
         });
