@@ -35,6 +35,10 @@ export default {
      * Contient les données de tous le formulaire.
      */
     EntitiesForm: [],
+    /**
+     * Contient les textes utiliser au niveau de l'application.
+     */
+    strings: {},
   }),
   mutations: {
     SET_HEADER(state, payload) {
@@ -105,9 +109,12 @@ export default {
         state.building_fields = false;
       }, state.RunBuildingForm.time);
     },
+    SET_STRINGS(state, payload) {
+      state.strings = payload;
+    },
   },
   actions: {
-    loadForm({ commit, state, dispatch }) {
+    loadForm({ commit }) {
       commit("ACTIVE_RUNNING");
       const param = {
         id: window.location.pathname.split("/").pop(),
@@ -117,7 +124,6 @@ export default {
       request
         .bPost("/vuejs-entity/form/get-form/from/entity-id", param, {}, false)
         .then((resp) => {
-          console.log("loadForm : ", resp.data[0]);
           commit("DISABLE_RUNNING");
           commit("SET_EntitiesForm", resp.data);
           setTimeout(() => {
@@ -140,6 +146,11 @@ export default {
             }
           }, 200);
         });
+    },
+    loadStrings({ commit }) {
+      request.get("/buildercv/get/strings").then((resp) => {
+        commit("SET_STRINGS", resp.data);
+      });
     },
     // Permet de mettre à jour un champs ...
     setValue({ commit }, payload) {

@@ -5,14 +5,13 @@
         <hbk-button @click="openModal"> Conseils </hbk-button>
       </template>
       <HCardIcon icon="exclamation-lg">
-        <template #titre>Dites-nous en plus sur vous </template>
+        <template #titre> Dites-nous en plus sur vous </template>
         <div>
           Dites-nous qui vous êtes, comment les employeurs peuvent vous
           contacter et quelle est votre profession
         </div>
       </HCardIcon>
 
-      <h4 class="font-weight-bold">Coordonnées</h4>
       <component
         :is="container.template"
         v-for="(container, i) in fields"
@@ -31,7 +30,6 @@
           :parent-name="'0.entities.presentation.' + i + '.entity.'"
           :parent-child-name="'0.entities.presentation.' + i + '.entities.'"
           namespace-store="storeForm"
-          @array_move="array_move($event, render)"
         ></component>
       </component>
       <template #app-footer>

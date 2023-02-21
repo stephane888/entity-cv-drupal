@@ -23,7 +23,7 @@ export default {
   messages: { errors: [], warnings: [] },
   runStep(steps, state) {
     console.log(" currentBuildStep : ", this.currentBuildStep);
-    // On recupere
+    // On recupere.
     var getDataStep = () => {
       if (steps[this.currentBuildStep]) {
         return steps[this.currentBuildStep];
