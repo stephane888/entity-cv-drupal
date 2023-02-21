@@ -15,7 +15,6 @@ export default {
      * footer_paragraph
      */
     footer_paragraph: {},
-
     //
     running: false,
     //
@@ -149,7 +148,7 @@ export default {
     },
     loadStrings({ commit }) {
       request.get("/buildercv/get/strings").then((resp) => {
-        commit("SET_STRINGS", resp.data);
+        commit("SET_STRINGS", resp.data.texts);
       });
     },
     // Permet de mettre à jour un champs ...

@@ -173,6 +173,113 @@ export default new Vuex.Store({
         return state.storeForm.layout_paragraphs[keySections].entity;
       } else return {};
     },
+    /**
+     * Entrée pour les textes.
+     */
+    string_modal: (state) => {
+      const modal = {
+        title_button_modal: "Conseils",
+        button: "J'ai compris",
+        desc_modal: {
+          value: "",
+        },
+        desc_header: {
+          value: "",
+        },
+      };
+      if (state.storeForm.strings && state.storeForm.strings.modal) {
+        modal.title_button_modal =
+          state.storeForm.strings.modal.title_button_modal;
+        modal.button = state.storeForm.strings.modal.button;
+        modal.desc_modal.value = state.storeForm.strings.modal.desc_modal.value;
+        modal.desc_header.value =
+          state.storeForm.strings.modal.desc_header.value;
+      }
+      return modal;
+    },
+    string_actions: (state) => {
+      const actions = {
+        buttons_next: "Etape suivante",
+        buttons_previews: "Etape precedente",
+        create_cv: "Crrer votre CV",
+        see_cv: "Voir votre CV",
+        admin_cv: "Adminitration de votre CV",
+      };
+      if (state.storeForm.strings && state.storeForm.strings.actions) {
+        actions.buttons_next = state.storeForm.strings.actions.buttons_next;
+        actions.buttons_previews =
+          state.storeForm.strings.actions.buttons_previews;
+        actions.create_cv = state.storeForm.strings.actions.create_cv;
+        actions.see_cv = state.storeForm.strings.actions.see_cv;
+        actions.admin_cv = state.storeForm.strings.actions.admin_cv;
+      }
+      return actions;
+    },
+    strings_presentation: (state) => {
+      const presentation = {
+        title_box: "Dites-nous en plus sur vous",
+        desc_box: {
+          value: "",
+        },
+      };
+      if (state.storeForm.strings && state.storeForm.strings.presentation) {
+        presentation.title_box = state.storeForm.strings.presentation.title_box;
+        presentation.desc_box.value =
+          state.storeForm.strings.presentation.desc_box.value;
+      }
+      return presentation;
+    },
+    strings_experience: (state) => {
+      const experience = {
+        title_box: "Expérience professionnelle",
+        desc_box: {
+          value: "",
+        },
+      };
+      if (state.storeForm.strings && state.storeForm.strings.experience) {
+        experience.title_box = state.storeForm.strings.experience.title_box;
+        experience.desc_box.value =
+          state.storeForm.strings.experience.desc_box.value;
+      }
+      return experience;
+    },
+    strings_formation: (state) => {
+      const formation = {
+        title_box: "Expérience professionnelle",
+        desc_box: {
+          value: "",
+        },
+      };
+      if (state.storeForm.strings && state.storeForm.strings.formation) {
+        formation.title_box = state.storeForm.strings.formation.title_box;
+        formation.desc_box.value =
+          state.storeForm.strings.formation.desc_box.value;
+      }
+      return formation;
+    },
+    strings_createpage: (state) => {
+      const createpage = {
+        title_box: "Creer votre CV",
+        desc_box: {
+          value: "",
+        },
+      };
+      if (state.storeForm.strings && state.storeForm.strings.createpage) {
+        createpage.title_box = state.storeForm.strings.createpage.title_box;
+        createpage.desc_box.value =
+          state.storeForm.strings.createpage.desc_box.value;
+      }
+      return createpage;
+    },
+    strings_steps: (state) => {
+      if (state.storeForm.strings && state.storeForm.strings.steps) {
+        const steps = state.storeForm.strings.steps;
+        state.build_steps.forEach((item, i) => {
+          if (steps[item.step]) state.build_steps[i].titre = steps[item.step];
+        });
+      }
+      return state.build_steps;
+    },
   },
   mutations: {
     ACTIVE_CREATION(state) {

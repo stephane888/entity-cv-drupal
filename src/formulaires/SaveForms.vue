@@ -1,15 +1,14 @@
 <template>
   <div>
-    <ContainerPage>
+    <ContainerPage :strings_steps="strings_steps">
       <template #entete>
-        <hbk-button @click="openModal"> Conseils </hbk-button>
+        <hbk-button @click="openModal">
+          {{ string_modal.title_button_modal }}
+        </hbk-button>
       </template>
       <HCardIcon icon="exclamation-lg">
-        <template #titre> Creer votre CV </template>
-        <div>
-          Votre cv va etre generer à partir des informations fournis, vous
-          pouvez les modifiers plus tard.
-        </div>
+        <template #titre> {{ strings_createpage.title_box }} </template>
+        <div v-html="strings_createpage.desc_box.value"></div>
       </HCardIcon>
 
       <div v-if="errorMessages.length" class="content-save-text mx-auto mt-5">
@@ -68,11 +67,11 @@
 
       <div v-if="finish_status" class="action d-flex flex-column">
         <b-button @click="open_new_site">
-          "Adminitration de votre CV"
+          {{ string_actions.admin_cv }}
           <b-icon icon="award" font-scale="1.3" class="float-right"></b-icon>
         </b-button>
         <b-button @click="open_new_site_admin">
-          Voir votre CV
+          {{ string_actions.see_cv }}
           <b-icon
             icon="folder-symlink"
             font-scale="1.3"
@@ -81,7 +80,7 @@
         </b-button>
       </div>
       <div v-if="finish_status" class="my-5 h3">
-        "Voir votre CV"
+        {{ string_actions.see_cv }}
         <a @click="open_new_site">
           <b> {{ new_hostname }} </b>
         </a>
@@ -97,7 +96,7 @@
             icon-variant=""
             class="mr-4 text-muted"
           >
-            Etape precedente
+            {{ string_actions.buttons_previews }}
           </hbk-button>
         </router-link>
         <hbk-button
@@ -107,7 +106,7 @@
           size="lg"
           @click="saveCv"
         >
-          Créer votre CV
+          {{ string_actions.create_cv }}
         </hbk-button>
       </div>
     </ContainerPage>
@@ -117,7 +116,12 @@
       @closeModal="closeModal"
     >
       <template #header>
-        <HCardIcon :with-mb="false"></HCardIcon>
+        <HCardIcon :with-mb="false">
+          <template #titre> {{ string_modal.button }} </template>
+          <template>
+            <div>{{ string_modal.desc_header }}</div>
+          </template>
+        </HCardIcon>
       </template>
     </modalForm>
   </div>
@@ -125,7 +129,7 @@
 
 <script>
 import modalForm from "./modalForm.vue";
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 export default {
   name: "EtapeExperience",
   components: {
@@ -146,6 +150,12 @@ export default {
       strings: (state) => state.strings,
       messages: (state) => state.messages,
     }),
+    ...mapGetters([
+      "string_modal",
+      "string_actions",
+      "strings_createpage",
+      "strings_steps",
+    ]),
     warningMessages() {
       if (this.messages.warnings && this.messages.warnings.length) {
         return this.messages.warnings;

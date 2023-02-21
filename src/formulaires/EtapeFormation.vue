@@ -2,15 +2,13 @@
   <div>
     <ContainerPage>
       <template #entete>
-        <hbk-button @click="openModal"> Conseils </hbk-button>
+        <hbk-button @click="openModal">
+          {{ string_modal.title_button_modal }}
+        </hbk-button>
       </template>
       <HCardIcon icon="exclamation-lg">
-        <template #titre> Vos diplomes / formations </template>
-        <div>
-          Commencez par vos études les plus récentes et remontez dans le passé.
-          Si vous avez suivi de nombreuses études, n'ajoutez que les plus
-          récentes et pertinentes.
-        </div>
+        <template #titre> {{ strings_formation.title_box }} </template>
+        <div v-html="strings_formation.desc_box.value"></div>
       </HCardIcon>
       <component
         :is="container.template"
@@ -41,12 +39,12 @@
               icon-variant=""
               class="mr-4 text-muted"
             >
-              Etape precedente
+              {{ string_actions.buttons_previews }}
             </hbk-button>
           </router-link>
           <router-link :to="nextStep">
             <hbk-button icon="save" variant="outline-info" icon-variant="">
-              Etape suivante
+              {{ string_actions.buttons_next }}
             </hbk-button>
           </router-link>
         </div>
@@ -103,7 +101,12 @@ export default {
       user: (state) => state.user,
       layout_paragraphs: (state) => state.layout_paragraphs,
     }),
-    ...mapGetters(["etapes"]),
+    ...mapGetters([
+      "etapes",
+      "string_modal",
+      "string_actions",
+      "strings_formation",
+    ]),
     nextStep() {
       // if (this.user && this.user.uid) return "/save-cv";
       // else return "/login";

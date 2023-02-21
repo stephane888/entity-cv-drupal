@@ -2,14 +2,13 @@
   <div>
     <ContainerPage>
       <template #entete>
-        <hbk-button @click="openModal"> Conseils </hbk-button>
+        <hbk-button @click="openModal">
+          {{ string_modal.title_button_modal }}
+        </hbk-button>
       </template>
       <HCardIcon icon="exclamation-lg">
-        <template #titre> Dites-nous en plus sur vous </template>
-        <div>
-          Dites-nous qui vous êtes, comment les employeurs peuvent vous
-          contacter et quelle est votre profession
-        </div>
+        <template #titre> {{ strings_presentation.title_box }} </template>
+        <div v-html="strings_presentation.desc_box.value"></div>
       </HCardIcon>
 
       <component
@@ -36,7 +35,7 @@
         <div>
           <router-link to="/experience">
             <hbk-button icon="save" variant="outline-info" icon-variant="">
-              Etape suivante
+              {{ string_actions.buttons_next }}
             </hbk-button>
           </router-link>
         </div>
@@ -56,7 +55,7 @@
 
 <script>
 import modalForm from "./modalForm.vue";
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 import generateField from "components_h_vuejs/src/js/FormUttilities";
 export default {
   name: "EtapePresentation",
@@ -89,7 +88,9 @@ export default {
         }
         return fields;
       },
+      strings: (state) => state.strings,
     }),
+    ...mapGetters(["string_modal", "string_actions", "strings_presentation"]),
   },
   methods: {
     openModal() {

@@ -6,7 +6,9 @@
         class="entete d-flex justify-content-center align-items-start mb-4"
       >
         <slot name="entete">
-          <hbk-button @click="openModal"> Conseils </hbk-button>
+          <hbk-button @click="openModal">
+            {{ string_modal.title_button_modal }}
+          </hbk-button>
         </slot>
       </header>
       <main class="row justify-content-center">
@@ -40,6 +42,7 @@
 <script>
 import vueCustomScrollbar from "vue-custom-scrollbar";
 import "vue-custom-scrollbar/dist/vueScrollbar.css";
+import { mapState, mapGetters } from "vuex";
 export default {
   name: "ContainerPage",
   components: {
@@ -63,6 +66,9 @@ export default {
         wheelPropagation: false,
       },
     };
+  },
+  computed: {
+    ...mapGetters(["string_modal"]),
   },
   methods: {
     /**

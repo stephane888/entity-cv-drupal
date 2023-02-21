@@ -1,12 +1,9 @@
 <template>
   <div>
     <ContainerPage>
-      <template #entete>
-        <hbk-button @click="openModal"> Conseils </hbk-button>
-      </template>
       <HCardIcon icon="exclamation-lg">
-        <template #titre> {{ headerBlock.title }} </template>
-        <div v-html="headerBlock.text"></div>
+        <template #titre> '' </template>
+        <div></div>
       </HCardIcon>
       <component
         :is="container.template"
@@ -39,12 +36,12 @@
               icon-variant=""
               class="mr-4 text-muted"
             >
-              Etape precedente
+              {{ string_actions.buttons_previews }}
             </hbk-button>
           </router-link>
           <router-link :to="nextStep">
             <hbk-button icon="save" variant="outline-info" icon-variant="">
-              Etape suivante
+              {{ string_actions.buttons_next }}
             </hbk-button>
           </router-link>
         </div>
@@ -123,7 +120,7 @@ export default {
       },
       user: (state) => state.user,
     }),
-    ...mapGetters(["etapes"]),
+    ...mapGetters(["etapes", "string_actions"]),
     nextStep() {
       const idEtape = parseInt(this.idEtape) + 1;
       const length = this.etapes.length;
@@ -144,40 +141,6 @@ export default {
         return "/layouts-sections/" + this.etapes[idEtape] + "/" + idEtape;
       } else return "/formation";
     },
-    headerBlock() {
-      const datas = { title: "", text: "" };
-      switch (this.keySections) {
-        case "competences_et_langues_cv_":
-          datas.title = "Compétences et langues";
-          datas.text =
-            "<p> Les compétences que vous ajoutez devraient correspondre aux prérequis du poste auquel vous postulez. </p> <p>Vous pouvez remplir la section langue si vous parlez plus d'une langue.</p> ";
-          break;
-        case "loisir_cv_":
-          datas.title = "Centres d'intérêt ou Loisirs";
-          datas.text =
-            "<p> Demandez-vous si l’activité que vous pratiquez vous donne une bonne image, si ce hobby peut vous distinguer des autres candidats et si c’est une passion dont vous pourrez parler avec enthousiasme lors de l’entretien. Evitez les platitudes, les clichés et les lieux communs. </p>";
-          break;
-        default:
-          break;
-      }
-      return datas;
-    },
-    // rebuildFields() {
-    //   if (this.keySections) {
-    //     console.log(" Maj du lien keySections : ", this.keySections);
-    //     this.$store.dispatch("storeForm/buildFieldsDynamiqueStep");
-    //     return this.keySections;
-    //   } else return 0;
-    // },
-  },
-  // watch: {
-  //   keySections() {
-  //     console.log(" Maj du lien keySections : ", this.keySections);
-  //     //this.$store.dispatch("storeForm/buildFieldsDynamiqueStep");
-  //   },
-  // },
-  mounted() {
-    //
   },
   methods: {
     /**
