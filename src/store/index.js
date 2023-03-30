@@ -1,9 +1,10 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import storeForm from "../formulaires/storeForm";
-import saveEntity from "./GenerateCv";
+import GenerateCv from "./GenerateCv";
 import router from "../router/index";
 import request from "../request";
+import generateField from "components_h_vuejs/src/js/FormUttilities";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -19,6 +20,17 @@ export default new Vuex.Store({
     finish_status: false,
     // Nouveau nom de domaine.
     new_hostname: null,
+    /**
+     * Suit la construction des formualires.
+     */
+    building_fields: false,
+    /**
+     *  Permet de definir un temps moyen pour la constructin d'un formulaire.
+     */
+    RunBuildingForm: {
+      time: 3000,
+      timeout: null,
+    },
     // Les differences etapes du processus.
     build_steps: [
       {
@@ -68,10 +80,18 @@ export default new Vuex.Store({
       name: [{ value: "" }],
       mail: [{ value: "" }],
     },
+    /**
+     * Permet de suivre la creation des entites.
+     */
+    run_entity: {
+      numbers: 0,
+      creates: 0,
+      page: "",
+    },
   },
   getters: {
     /**
-     * Les identifiants de champs doivent prevenir du model.
+     * Les identifiants de champs doivent provenir du model.
      */
     SubDomain: (state) => {
       if (
@@ -159,20 +179,20 @@ export default new Vuex.Store({
      * @param {*} state
      * @returns
      */
-    modelDynamique: (state) => {
-      if (
-        router.history.current.params &&
-        router.history.current.params.keySections &&
-        state.storeForm.layout_paragraphs
-      ) {
-        console.log(
-          "router.history.current.params: ",
-          router.history.current.params
-        );
-        const keySections = router.history.current.params.keySections;
-        return state.storeForm.layout_paragraphs[keySections].entity;
-      } else return {};
-    },
+    // modelDynamique: (state) => {
+    //   if (
+    //     router.history.current.params &&
+    //     router.history.current.params.keySections &&
+    //     state.storeForm.layout_paragraphs
+    //   ) {
+    //     console.log(
+    //       "router.history.current.params: ",
+    //       router.history.current.params
+    //     );
+    //     const keySections = router.history.current.params.keySections;
+    //     return state.storeForm.layout_paragraphs[keySections].entity;
+    //   } else return {};
+    // },
     /**
      * Entrée pour les textes.
      */
@@ -314,18 +334,30 @@ export default new Vuex.Store({
     DISABLE_RUNNING(state) {
       state.running = false;
     },
+    /**
+     * il est assez complique de suivre, la construction d'un formulaire;
+     * donc, on va fixer une valeur de 3s par appel.
+     * @param {*} state
+     */
+    RUN_BUILDING_FIELDS(state) {
+      state.building_fields = true;
+      clearTimeout(state.RunBuildingForm.timeout);
+      state.RunBuildingForm.timeout = setTimeout(() => {
+        state.building_fields = false;
+      }, state.RunBuildingForm.time);
+    },
   },
   actions: {
     //
     create_site_cv({ commit, state }) {
       commit("ACTIVE_CREATION");
       commit("ACTIVE_RUNNING");
-      saveEntity.runStep(state.build_steps, state);
+      GenerateCv.runStep(state.build_steps, state);
     },
     //
     reset_creation({ commit }) {
       commit("DISABLE_CREATION");
-      saveEntity.currentBuildStep = 0;
+      GenerateCv.currentBuildStep = 0;
     },
     // Load strings texte
     loadStrings({ commit }) {
@@ -340,19 +372,15 @@ export default new Vuex.Store({
       if (context.getters.SubDomain) return context.getters.SubDomain;
       else throw new "Nom de domaine non definit"();
     },
-    saveEntities({ commit, state }) {
+    saveEntities({ commit, state }, currentEntity) {
       return new Promise((resolv, reject) => {
         commit("ACTIVE_RUNNING");
         generateField
-          .getNumberEntities(state.currentEntityForm)
+          .getNumberEntities(currentEntity)
           .then((numbers) => {
             state.run_entity.numbers = numbers;
             generateField
-              .prepareSaveEntities(
-                this,
-                state.currentEntityForm,
-                state.run_entity
-              )
+              .prepareSaveEntities(this, currentEntity, state.run_entity, true)
               .then((resp) => {
                 commit("DISABLE_RUNNING");
                 resolv(resp);
@@ -380,11 +408,7 @@ export default new Vuex.Store({
               payload.value
             )
             .then((resp) => {
-              console.log("resp : ", resp);
-              // setTimeout(() => {
-              console.log(" payload : ", payload);
               resolv(resp);
-              // }, 1000);
             })
             .catch((er) => {
               reject(er);

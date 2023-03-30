@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :fieldsWaiter="fieldsWaiter">
     <ContainerPage>
       <HCardIcon icon="exclamation-lg">
         <template #titre> '' </template>
@@ -7,7 +7,7 @@
       </HCardIcon>
       <component
         :is="container.template"
-        v-for="(container, i) in fields"
+        v-for="(container, i) in fieldsInterne"
         :key="i"
         :entity="container.entity"
         :class-entity="['pt-1']"
@@ -84,38 +84,23 @@ export default {
     return {
       titleModal: "",
       manageModal: false,
+      fieldsInterne: [],
     };
   },
 
   computed: {
     ...mapState("storeForm", {
       building_fields: (state) => state.building_fields,
-      EntitiesForm: (state) => state.EntitiesForm,
-      fields() {
-        var fields = [];
-        if (
-          this.keySections &&
-          this.EntitiesForm &&
-          this.EntitiesForm[0] &&
-          this.EntitiesForm[0].entities &&
-          this.EntitiesForm[0].entities.layout_paragraphs
-        ) {
-          loadField.setConfig(request);
-
-          var keySections = 0;
-          if (
-            this.$router.history.current.params &&
-            this.$router.history.current.params.keySections
-          ) {
-            keySections = this.$router.history.current.params.keySections;
-          }
-          generateField.generateFields(
-            [this.EntitiesForm[0].entities.layout_paragraphs[keySections]],
-            fields,
-            ""
-          );
-        }
-        return fields;
+      entities(state) {
+        if (state.EntitiesForm[0] && state.EntitiesForm[0].entities) {
+          return state.EntitiesForm[0].entities.layout_paragraphs;
+        } else return [];
+      },
+      fieldsWaiter() {
+        if (this.keySections && this.entities.length > 0) {
+          this.generateFields(this.keySections);
+          return this.keySections;
+        } else return null;
       },
       user: (state) => state.user,
     }),
@@ -141,6 +126,7 @@ export default {
       } else return "/formation";
     },
   },
+
   methods: {
     /**
      * --//
@@ -151,6 +137,19 @@ export default {
     },
     closeModal() {
       this.manageModal = false;
+    },
+    generateFields(keySections) {
+      keySections = parseInt(keySections);
+      loadField.setConfig(request);
+      var fields = [];
+      if (this.entities) {
+        generateField.generateFields([this.entities[keySections]], fields, "");
+        this.fieldsInterne = [];
+        // on doit vider le champs pendant un laps de temps, sinon cela ne fonctionne pas.
+        setTimeout(() => {
+          this.fieldsInterne = fields;
+        }, 300);
+      }
     },
   },
 };

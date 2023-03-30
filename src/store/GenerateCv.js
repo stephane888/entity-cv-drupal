@@ -2,6 +2,7 @@ import store from "./index";
 import request from "../request";
 import { limit } from "stringz";
 import generateField from "components_h_vuejs/src/js/FormUttilities";
+import EntityUtilities from "components_h_vuejs/src/js/ClassFormUtilities";
 
 export default {
   ...request,
@@ -328,68 +329,96 @@ export default {
     });
   },
   // On va cree la page d'accueil en function de l'identifiant present dans l'url.
+  /**
+   * Pour cette creation on doit utilier le module () car il permet de mieux gerer les données sous forme de matrice.
+   * Mais on va ressortir uniquement les champs concernant le CV :
+   * - experience
+   * - layout_paragraphs
+   * - formation
+   * - presentation
+   * @param {*} state
+   * @returns
+   */
   CreateContents(state) {
     return new Promise((resolv, reject) => {
+      generateField.domainRegister = this.domainRegister;
       const EntitiesForm = state.storeForm.EntitiesForm[0].entities;
       const presentation = () => {
-        EntitiesForm.presentation[0].entity.field_domain_access = [
-          { target_id: this.domainRegister.id },
-        ];
-        EntitiesForm.presentation[0].entity.field_domain_source = [
-          { target_id: this.domainRegister.id },
-        ];
-        return this.bPost(
-          "/apivuejs/save-entity/paragraph",
-          EntitiesForm.presentation[0].entity
-        );
+        return new Promise((resolv, reject) => {
+          const entitySave = new EntityUtilities();
+          const suivers = {
+            creates: 0,
+          };
+          entitySave
+            .prepareSaveEntities(
+              store,
+              EntitiesForm.presentation,
+              suivers,
+              true
+            )
+            .then((resp) => {
+              resolv({ ids: entitySave.lastIdsEntity, resp: resp });
+            })
+            .catch((er) => {
+              reject(er);
+            });
+        });
       };
       const experience = () => {
-        EntitiesForm.experience[0].entity.field_domain_access = [
-          { target_id: this.domainRegister.id },
-        ];
-        EntitiesForm.experience[0].entity.field_domain_source = [
-          { target_id: this.domainRegister.id },
-        ];
-        return this.bPost(
-          "/apivuejs/save-entity/paragraph",
-          EntitiesForm.experience[0].entity
-        );
+        return new Promise((resolv, reject) => {
+          const entitySave = new EntityUtilities();
+          const suivers = {
+            creates: 0,
+          };
+          entitySave
+            .prepareSaveEntities(store, EntitiesForm.experience, suivers, true)
+            .then((resp) => {
+              resolv({ ids: entitySave.lastIdsEntity, resp: resp });
+            })
+            .catch((er) => {
+              reject(er);
+            });
+        });
       };
       const formation = () => {
-        EntitiesForm.formation[0].entity.field_domain_access = [
-          { target_id: this.domainRegister.id },
-        ];
-        EntitiesForm.formation[0].entity.field_domain_source = [
-          { target_id: this.domainRegister.id },
-        ];
-        return this.bPost(
-          "/apivuejs/save-entity/paragraph",
-          EntitiesForm.formation[0].entity
-        );
+        return new Promise((resolv, reject) => {
+          const entitySave = new EntityUtilities();
+          const suivers = {
+            creates: 0,
+          };
+          entitySave
+            .prepareSaveEntities(store, EntitiesForm.formation, suivers, true)
+            .then((resp) => {
+              resolv({ ids: entitySave.lastIdsEntity, resp: resp });
+            })
+            .catch((er) => {
+              reject(er);
+            });
+        });
       };
-      // For layout_paragraphs
-      const promises = [];
-      EntitiesForm.layout_paragraphs.forEach((item) => {
-        promises.push(
-          new Promise((resolv, reject) => {
-            item.entity.field_domain_access = [
-              { target_id: this.domainRegister.id },
-            ];
-            item.entity.field_domain_source = [
-              { target_id: this.domainRegister.id },
-            ];
-            this.bPost("/apivuejs/save-entity/paragraph", item.entity)
-              .then((resp) => {
-                resolv({ target_id: resp.data.id });
-              })
-              .catch((er) => {
-                reject(er);
-              });
-          })
-        );
-      });
+      const layout_paragraphs = () => {
+        return new Promise((resolv, reject) => {
+          const entitySave = new EntityUtilities();
+          const suivers = {
+            creates: 0,
+          };
+          console.log("Begin create  layout_paragraphs ");
+          entitySave
+            .prepareSaveEntities(
+              store,
+              EntitiesForm.layout_paragraphs,
+              suivers,
+              true
+            )
+            .then((resp) => {
+              resolv({ ids: entitySave.lastIdsEntity, resp: resp });
+            })
+            .catch((er) => {
+              reject(er);
+            });
+        });
+      };
 
-      //
       const idHome = window.location.pathname.split("/").pop();
       let nom = store.getters.GetNom;
       let prenom = store.getters.GetPreNom;
@@ -402,20 +431,35 @@ export default {
         name: [{ value: title }],
         field_domain_access: [{ target_id: this.domainRegister.id }],
         field_domain_source: [{ target_id: this.domainRegister.id }],
+        presentation: [],
+        experience: [],
+        formation: [],
+        layout_paragraphs: [],
+        layout_builder__layout: [],
       };
+
+      // On recupere la configuration du model de CV.
+      if (
+        state.storeForm.EntitiesForm[0].entity &&
+        state.storeForm.EntitiesForm[0].entity.layout_builder__layout
+      )
+        values["layout_builder__layout"] =
+          state.storeForm.EntitiesForm[0].entity.layout_builder__layout;
       presentation()
         .then((resp) => {
-          values["presentation"] = [{ target_id: resp.data.id }];
+          values["presentation"] = resp.ids;
           experience()
             .then((res) => {
-              values["experience"] = [{ target_id: res.data.id }];
+              values["experience"] = res.ids;
               formation()
                 .then((re) => {
-                  values["formation"] = [{ target_id: re.data.id }];
-                  Promise.all(promises)
-                    .then((vals) => {
-                      values["layout_paragraphs"] = vals;
+                  values["formation"] = re.ids;
+                  layout_paragraphs()
+                    .then((resps) => {
+                      console.log("save layout_paragraphs :", resps);
+                      values["layout_paragraphs"] = resps.ids;
                       resolv(
+                        // On cree le cv à partir des données present dans values.
                         this.bPost(
                           "/buildercv/entity/generate-cv/" + idHome,
                           values

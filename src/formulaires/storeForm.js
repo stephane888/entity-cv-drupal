@@ -19,17 +19,7 @@ export default {
     running: false,
     //
     user: {},
-    /**
-     * Suit la construction des formualires.
-     */
-    building_fields: false,
-    /**
-     *  Permet de definir un temps moyen pour la constructin d'un formulaire.
-     */
-    RunBuildingForm: {
-      time: 3000,
-      timeout: null,
-    },
+
     /**
      * Contient les données de tous le formulaire.
      */
@@ -96,18 +86,7 @@ export default {
       localStorage.removeItem("app_cv.entities_form");
       localStorage.removeItem("app_cv.hash");
     },
-    /**
-     * il est assez complique de suivre, la construction d'un formulaire;
-     * donc, on va fixer une valeur de 3s par appel.
-     * @param {*} state
-     */
-    RUN_BUILDING_FIELDS(state) {
-      state.building_fields = true;
-      clearTimeout(state.RunBuildingForm.timeout);
-      state.RunBuildingForm.timeout = setTimeout(() => {
-        state.building_fields = false;
-      }, state.RunBuildingForm.time);
-    },
+
     SET_STRINGS(state, payload) {
       state.strings = payload;
     },
