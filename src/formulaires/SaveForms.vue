@@ -95,6 +95,7 @@
             variant="outline-light"
             icon-variant=""
             class="mr-4 text-muted"
+            :disabled="running || finish_status"
           >
             {{ string_actions.buttons_previews }}
           </hbk-button>
@@ -104,6 +105,7 @@
           variant="info"
           icon-variant=""
           size="lg"
+          :disabled="running || finish_status"
           @click="saveCv"
         >
           {{ string_actions.create_cv }}
@@ -149,6 +151,7 @@ export default {
       new_hostname: (state) => state.new_hostname,
       strings: (state) => state.strings,
       messages: (state) => state.messages,
+      running: (state) => state.running,
     }),
     ...mapGetters([
       "string_modal",

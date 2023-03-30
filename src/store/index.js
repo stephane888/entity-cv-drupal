@@ -319,6 +319,7 @@ export default new Vuex.Store({
     //
     create_site_cv({ commit, state }) {
       commit("ACTIVE_CREATION");
+      commit("ACTIVE_RUNNING");
       saveEntity.runStep(state.build_steps, state);
     },
     //

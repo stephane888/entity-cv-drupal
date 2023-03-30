@@ -121,7 +121,7 @@ export default {
         duplicate: true,
       };
       request
-        .bPost("/vuejs-entity/form/get-form/from/entity-id", param, {}, false)
+        .bPost("/apivuejs/edit-duplicate-entity", param, {}, false)
         .then((resp) => {
           commit("DISABLE_RUNNING");
           commit("SET_EntitiesForm", resp.data);

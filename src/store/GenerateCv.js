@@ -22,7 +22,7 @@ export default {
   OrtherPages: [],
   messages: { errors: [], warnings: [] },
   runStep(steps, state) {
-    console.log(" currentBuildStep : ", this.currentBuildStep);
+    console.log(" CurrentBuildStep : ", this.currentBuildStep);
     // On recupere.
     var getDataStep = () => {
       if (steps[this.currentBuildStep]) {

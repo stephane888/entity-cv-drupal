@@ -57,6 +57,8 @@
 import modalForm from "./modalForm.vue";
 import { mapState, mapGetters } from "vuex";
 import generateField from "components_h_vuejs/src/js/FormUttilities";
+import loadField from "components_h_vuejs/src/components/fieldsDrupal/loadField.js";
+import request from "../request";
 export default {
   name: "EtapePresentation",
   components: {
@@ -80,6 +82,7 @@ export default {
           this.EntitiesForm[0].entities &&
           this.EntitiesForm[0].entities.presentation
         ) {
+          loadField.setConfig(request);
           generateField.generateFields(
             this.EntitiesForm[0].entities.presentation,
             fields,
